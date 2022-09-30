@@ -1,0 +1,29 @@
+#:kivy 2.1.0
+
+store_window:
+	customers_tab: customers_tab
+	stock_tab: stock_tab
+	stastics_tab: stastics_tab
+	MDBoxLayout:
+		orientation: "vertical"
+		MDTopAppBar:
+			title: "Stock Managment"
+			pos_hint: {"y":.9}
+			bold: True
+			right_action_items: [["magnify"]]
+		MDTabs:
+			id: tabs
+			tab_hint_x: True
+			tab_indicator_anim: True
+			tab_padding: [5, 5, 5, 1]
+			elevation: 1 
+			Tab:
+				id: stock_tab
+				title: "Stock"
+			Tab:
+				id: customers_tab
+				title: "Customers"
+
+			Tab:
+				id: stastics_tab
+				title: "Stastics"

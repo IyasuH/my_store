@@ -27,8 +27,9 @@ import os
 import database
 import openpyxl
 
-# comment this out before pushing
+# comment this out before deploying
 Window.size = (325, 580)
+
 class Tab(MDFloatLayout, MDTabsBase):
 	"""
 	Tab class
@@ -56,6 +57,43 @@ class New_customer_layout(MDBoxLayout):
 class customerItem(TwoLineAvatarListItem):
 	pass
 
+class Home(MDScreen):
+	"""
+	main home page
+	"""
+	pass
+
+class DashBoard(MDScreen):
+	"""
+	This page is going to contain general-over
+		all informat expenseProfit using different cards
+	"""
+	pass
+
+
+class Stock(MDScreen):
+	"""
+	Stock page
+	"""
+	pass
+
+class Sales(MDScreen):
+	"""
+	Sales page
+	"""
+	pass
+
+class CashFlow(MDScreen):
+	"""
+	Cash Flow page
+	"""
+	pass
+
+class Customer(MDScreen):
+	"""
+	Customer page
+	"""
+	pass
 
 class Store_window(MDScreen):
 	"""
@@ -296,12 +334,13 @@ class main(MDApp):
 		build method
 		"""
 		if self.Hr < 18:
-			self.theme_cls.theme_style = "Light"
+			self.theme_cls.theme_style = "Dark"
 		else:
 			self.theme_cls.theme_style = "Dark"			
 		self.theme_cls.primary_palette = 'Blue'
 		screen_manager = ScreenManager()
-		screen_manager.add_widget(Builder.load_file("stock.kv"))
+		#screen_manager.add_widget(Builder.load_file("stock.kv"))
+		screen_manager.add_widget(Builder.load_file("home.kv"))
 		return screen_manager
 		
 

@@ -3,4 +3,62 @@
 Home:
     name: "home"
     MDScreen:
-    
+        MDBottomNavigation:
+            #panel_color: app.theme_cls.primary_light
+            text_color_normal: app.theme_cls.bg_normal
+            selected_color_background: app.theme_cls.bg_dark
+            set_bars_color: True
+            #use_text: True
+            MDBottomNavigationItem:
+                name: 'dashboard'
+                #text: ''
+                icon: 'home-outline'
+                DashBoard:
+                    MDScreen:
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            spacing: 20
+                            MDTopAppBar:
+                                widget_position: 'top'
+                                title: "DashBoard"
+                                left_action_items: [["sort-variant"]]
+                                right_action_items: [["tune-variant"]]
+                                md_bg_color: app.theme_cls.bg_normal
+                                headline_text: "Welcome"
+                                type_height: "medium"
+                                elevation: 4
+                            ScrollView:
+
+            MDBottomNavigationItem:
+                name: 'stock'
+                #text: ''
+                #icon: 'chart-box-outline'
+                icon: 'poll'
+                #text_color_normal: app.theme_cls.opposite_bg_light
+                #(here see the bottomnavigation bar doc file
+                # to actually cahange the icon color also to change the bg color only for icon for the middle button)
+                MDLabel:
+                    text: 'Stock'
+                    haDashboardlign: 'center'
+            MDBottomNavigationItem:
+                name: 'sales'
+                #text: ''
+                #icon: 'chart-timeline-variant'
+                icon: 'trending-up'
+                MDLabel:
+                    text: 'Slaes'
+                    halign: 'center'
+            MDBottomNavigationItem:
+                name: 'cashFlow'
+                #text: ''
+                icon: 'wallet-outline'
+                MDLabel:
+                    text: 'Cash flow'
+                    halign: 'center'
+            MDBottomNavigationItem:
+                name: 'customer'
+                #text: ''
+                icon: 'account-multiple-outline'
+                MDLabel:
+                    text: 'Customer'
+                    halign: 'center'

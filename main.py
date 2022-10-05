@@ -26,10 +26,53 @@ from kivy.core.window import Window
 import os
 import database
 import openpyxl
+from kivy.properties import ListProperty, NumericProperty, StringProperty
+from kivymd.uix.behaviors import RoundedRectangularElevationBehavior
+from kivymd.uix.card import MDCard
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.clock import Clock
+
+class MDashCard(MDCard):
+	#pass
+	focu_color = ListProperty([1, 1, 1])
+	unfocu_color = ListProperty([1, 1, 1])
+	text1 = StringProperty("")
+	text2 = StringProperty("")
+	text3 = StringProperty("")
+	# canbe Icon (arrow-top-right, arrow-bottom-right)
+	updownIcon = StringProperty("")
+	# range b/n 0-100
+	cpbValue = NumericProperty(0)
+	cpbBarColor = ListProperty([1, 1, 1])
+
+
+class CircularProgressBar(AnchorLayout):
+	bar_color = ListProperty([1, 1, 1])
+	bar_width = NumericProperty(2.5)
+	# where this value is the percent for the progress bar
+	set_value = NumericProperty(0)
+	text = StringProperty("0%")
+	value = NumericProperty(0)
+	counter = 0
+	duration = NumericProperty(1.5)
+
+	def __init__(self, **kwargs):
+		super(CircularProgressBar, self).__init__(**kwargs)
+		Clock.schedule_once(self.animate, 0)
+
+	def animate(self, *args):
+		Clock.schedule_interval(self.percent_counter, self.duration/self.value)
+
+	def percent_counter(self, *args):
+		if self.counter < self.value:
+			self.counter += 1 
+			self.text = f"+{self.counter}%"
+			self.set_value = self.counter
+		else:
+			Clock.unschedule(self.percent_counter)
 
 # comment this out before deploying
-Window.size = (325, 580)
-
+Window.size = (327, 580)
 class Tab(MDFloatLayout, MDTabsBase):
 	"""
 	Tab class
@@ -61,21 +104,20 @@ class Home(MDScreen):
 	"""
 	main home page
 	"""
-	pass
+
+class Stock(MDScreen):
+	"""
+	Stock page
+	"""
+	def func(self):
+		print('Print Stock page')
+
 
 class DashBoard(MDScreen):
 	"""
 	This page is going to contain general-over
 		all informat expenseProfit using different cards
 	"""
-	pass
-
-
-class Stock(MDScreen):
-	"""
-	Stock page
-	"""
-	pass
 
 class Sales(MDScreen):
 	"""
@@ -336,8 +378,9 @@ class main(MDApp):
 		if self.Hr < 18:
 			self.theme_cls.theme_style = "Dark"
 		else:
-			self.theme_cls.theme_style = "Dark"			
+			self.theme_cls.theme_style = "Dark"
 		self.theme_cls.primary_palette = 'Blue'
+		self.theme_cls.material_style ="M3"
 		screen_manager = ScreenManager()
 		#screen_manager.add_widget(Builder.load_file("stock.kv"))
 		screen_manager.add_widget(Builder.load_file("home.kv"))

@@ -1,17 +1,82 @@
 #:kivy 2.1.0
+<MDashCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '305dp', '105dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    #unfocus_color: root.unfocu_color
+    #focus_color: root.focu_color
+    #md_bg_color: root.unfocu_color
+    elevation: 3
+    ripple_behavior: True
+    MDRelativeLayout:
+        MDLabel:
+            bold: True
+            pos_hint: {"x":.1, "y":.27}
+            font_size: '14sp'
+            text: root.text1
+        MDLabel:
+            bold: True
+            pos_hint: {"x":.11, "y": .07}
+            font_size: '25sp'
+            text: root.text2
+            color: root.cpbBarColor
+        MDLabel:
+            #bold: True
+            pos_hint: {"x":.1, "y":-.2}
+            font_size: '13sp'
+            text: root.text3
+            color: [167/255, 167/255, 167/255, .7]
+        MDIconButton:
+            icon: root.updownIcon
+            disabled: True
+            theme_icon_color: "Custom"
+            pos_hint: {"x":.87, "y":.57}
+            disabled_color: root.cpbBarColor
+        MDFloatLayout:
+            #md_bg_color: 1, 0, 100/255, .1
+            CircularProgressBar:
+                size_hint: None, None
+                size: 50, 50
+                pos_hint: {"x": .75, "y": .3}
+                value: root.cpbValue
+                bar_color: root.cpbBarColor
+
+<CircularProgressBar>
+    canvas.before:
+        Color:
+            rgba: root.bar_color + [0.3]
+        Line:
+            width: root.bar_width
+            ellipse: (self.x, self.y, self.width, self.height, 0, 360)
+    canvas.after:
+        Color:
+            rgb: root.bar_color
+        Line:
+            width: root.bar_width
+            ellipse: (self.x, self.y, self.width, self.height, 0, root.set_value*3.6)
+    MDLabel:
+        text: root.text
+        bold: True
+        font_size: "15sp"
+        pos_hint: {"center_x": .5, "center_y": .5}
+        halign: "center"
+        color: root.bar_color
 
 Home:
     name: "home"
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
-            text_color_normal: app.theme_cls.bg_normal
-            selected_color_background: app.theme_cls.bg_dark
+            #text_color_no rmal: app.theme_cls.bg_normal
+            text_color_normal: app.theme_cls.opposite_bg_normal
+            selected_color_background: app.theme_cls.bg_normal
             set_bars_color: True
-            #use_text: True
             MDBottomNavigationItem:
                 name: 'dashboard'
-                #text: ''
+                text: 'Home'
                 icon: 'home-outline'
                 DashBoard:
                     MDScreen:
@@ -23,26 +88,104 @@ Home:
                                 title: "DashBoard"
                                 left_action_items: [["sort-variant"]]
                                 right_action_items: [["tune-variant"]]
+                                specific_text_color: app.theme_cls.opposite_bg_normal
                                 md_bg_color: app.theme_cls.bg_normal
-                                headline_text: "Welcome"
-                                type_height: "medium"
-                                elevation: 4
+                                elevation: 1
                             ScrollView:
+                                do_scroll_x: False
+                                scroll_distance: 30
+                                scroll_timeout: 80
+                                MDBoxLayout:
+                                    adaptive_size: True
+                                    padding: "10sp"
+                                    spacing: "17dp"
+                                    orientation: 'vertical'
+                                    pos_hint: {"center_x": .5, "center_y": .5}
+                                    MDLabel:
+                                        text: 'Hello Bety'
+                                        bold: True
+                                        font_size: '28sp'
+                                    MDLabel:
+                                        text: ''    
+                                    MDLabel:
+                                        font_size: '15sp'
+                                        text: 'Welcome Back!'
+                                        color: [167/255, 167/255, 167/255, .5]
+                                    MDashCard:
+                                        id: sales
+                                        focu_color: 1, 0, 100/255, .2
+                                        unfocu_color: 1, 0, 100/255, .15
+                                        text1: 'Sales'
+                                        text2: '$40000'
+                                        text3: 'Total Profit This Month'
+                                        updownIcon: 'arrow-top-right'
+                                        cpbValue: 37
+                                        cpbBarColor: [250/255, 115/255, 0]
+                                    MDashCard:
+                                        id: profitCard
+                                        focu_color: 1, 0, 100/255, .2
+                                        unfocu_color: 1, 0, 100/255, .15
+                                        text1: 'Profit'
+                                        text2: '$40000'
+                                        text3: 'Total Profit This Month'
+                                        updownIcon: 'arrow-bottom-right'
+                                        cpbValue: 42
+                                        cpbBarColor: [38/255, 255/255, 0]
+                                    MDashCard:
+                                        id: customersCard
+                                        focu_color: 1, 0, 100/255, .2
+                                        unfocu_color: 1, 0, 100/255, .15
+                                        text1: 'Customers'
+                                        text2: '40000'
+                                        text3: 'Total Profit This Month'
+                                        updownIcon: 'arrow-top-right'
+                                        cpbValue: 67
+                                        cpbBarColor: [0, 163/255, 250/255]
+                                    MDashCard:
+                                        id: customersCard
+                                        focu_color: 1, 0, 100/255, .2
+                                        unfocu_color: 1, 0, 100/255, .15
+                                        text1: 'Expense'
+                                        text2: '$40000'
+                                        text3: 'Total Profit This Month'
+                                        updownIcon: 'arrow-bottom-right'
+                                        cpbValue: 22
+                                        cpbBarColor: [1, 0, 100/255]
 
+
+                                    
+                                    #RecycleView:
+                                        #id: profitCards
+                                        #size_hint_x: None
+                                        #width: root.width * 95 / 100
+                                        #size_hint: 1, 1 
+                                        #pos_hint: {"center_x": .5}
+                                        #bar_width: 0
+                                        #key_viewclass: 'viewclass'
+                                        #key_size: 'height'
+                                        #RecycleGridLayout:
+                                            #cols: 2
+                                            #padding: dp(10)
+                                            #spacing: dp(24)
+                                            #default_size: None, dp(200)
+                                            #default_size_hint: 1, None
+                                            #size_hint_y: None
+                                            #height: self.minimum_height
             MDBottomNavigationItem:
                 name: 'stock'
-                #text: ''
+                text: 'Stock'
                 #icon: 'chart-box-outline'
                 icon: 'poll'
-                #text_color_normal: app.theme_cls.opposite_bg_light
-                #(here see the bottomnavigation bar doc file
-                # to actually cahange the icon color also to change the bg color only for icon for the middle button)
-                MDLabel:
-                    text: 'Stock'
-                    haDashboardlign: 'center'
+                on_tab_touch_down: Stock.func(Stock())
+                Stock:
+                    MDScreen:
+                        MDLabel:
+                            text: 'Stock'
+                            haDashboardlign: 'center'
+                    
             MDBottomNavigationItem:
                 name: 'sales'
-                #text: ''
+                text: 'Sales'
                 #icon: 'chart-timeline-variant'
                 icon: 'trending-up'
                 MDLabel:
@@ -50,14 +193,14 @@ Home:
                     halign: 'center'
             MDBottomNavigationItem:
                 name: 'cashFlow'
-                #text: ''
+                text: 'Cash'
                 icon: 'wallet-outline'
                 MDLabel:
                     text: 'Cash flow'
                     halign: 'center'
             MDBottomNavigationItem:
                 name: 'customer'
-                #text: ''
+                text: 'Customer'
                 icon: 'account-multiple-outline'
                 MDLabel:
                     text: 'Customer'

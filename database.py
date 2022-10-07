@@ -16,24 +16,24 @@ def insertCustomer(cName, cTinNumber, cRegion, cSubcity, cWereda, cPhoneNumber, 
     """
     insert function for customers table
     """
-    #c.execute("insert into customers (customerName, customerTinNumber, customerRegion, customerSubcity, customerWereda, customerPhoneN, accountCreatedDate, frequencyOfPurchase, totalPurchase, bankAccountNumber) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (cName, cTinNumber, cRegion, cSubcity, cWereda, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc))
     c.execute("insert into customers (customerName, customerTinNumber, customerRegion, customerSubcity, customerWereda, customerPhoneN, accountCreatedDate, frequencyOfPurchase, totalPurchase, bankAccountNumber) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (cName, int(cTinNumber), cRegion, cSubcity, int(cWereda), int(cPhoneNumber), createdDate, int(frequencyPurcases), int(totPurchases), int(bankAcc)))
     conn.commit()
     print('data inserted successfully')
 
-def insertItem(iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, updatedAt):
+def insertItem(iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk):
     """
     insert function for Item table
     """
-    #c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedPrice, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(%s, %s, %s, %s, %s, %s, %s)", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, updatedAt))
-    c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedPrice, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?)", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, updatedAt))
+    # initaly updateAt == purchaseDate 
+    # so no need to accept updateAt argument
+    c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedPrice, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?)", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, purchasedDate))
+    print('data inserted successfully')
     conn.commit()
 
 def insertSales(itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue):
     """
     insert function for sales table
     """
-    #c.execute("INSERT INTO sales(itemId, customerId, itemQuantity, soldDate, wayOfPayment, salesRevenue) VALUES(%s, %s, %s, %s, %s)", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue))
     c.execute("INSERT INTO sales(itemId, customerId, itemQuantity, soldDate, wayOfPayment, salesRevenue) VALUES(?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue))
     conn.commit()
 
@@ -70,13 +70,27 @@ def readItem():
     Items = c.fetchall()
     return Items
 
+def detailItem(CID):
+    """
+    retrive all the information from database
+    """
+    c.execute("SELECT * FROM inventory where itemId=?", (CID, ))
+    customer = c.fetchone()
+    return customer
+
+
 def readSItem():
     """
     selecting only specific columns
     """
     c.execute("SELECT itemId, itemName, itemQuantity, purchasedPrice, sellingPriceCherecharo, sellingPriceBulk FROM inventory")
     items = c.fetchall()
-    return items
+    cToList = []
+    for x in items:
+        cToList.append(list(x))
+    #for x in cToList:
+        #if x[2] < 
+    return cToList
 
 
 def readSales():
@@ -108,16 +122,26 @@ def deleteCustomer(cId):
     """
     deleteCustomer row with id cId
     """
+    c.execute("DELETE from customers where customerId = ?", (cId))
+    print("Deleted")
+    conn.commit()
+
 
 def deleteItem(iId):
     """
     deleteItem row with id iId
     """
+    c.execute("DELETE from inventory where itemId = ?", (iId))
+    print("Deleted")
+    conn.commit()
 
 def deleteSales(sId):
     """
     deleteSales row with id sId
     """
+    c.execute("DELETE from sales where salesId = ?", (sId))
+    print("Deleted")
+    conn.commit()
 
 def closeCursor():
     c.close()

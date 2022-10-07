@@ -97,21 +97,207 @@ class New_customer_layout(MDBoxLayout):
 		else:
 			print('fill all info msg')
 
+class New_stock_layout(MDBoxLayout):
+	"""
+	Popup to add new item
+	"""
+	def __init__(self) -> None:
+		super(New_stock_layout, self).__init__()
+
+	def addNewItem(self):
+		"""
+		when new item is added
+		"""
+		print("new stoklayout")
+		print(self.item_name.text, self.item_quantity.text, self.purchased_price.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
+		if self.item_name.text and self.item_quantity.text and self.purchased_price.text and self.purchased_date.text and self.selling_price_single.text and self.selling_price_bulk.text:
+			database.insertItem(self.item_name.text, self.item_quantity.text, self.purchased_price.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
+			toast('Data saved successfully now you can close')
+		else:
+			toast('Complete filling the info')
+
 class customerItem(TwoLineAvatarListItem):
 	pass
+
+class Detail_item_layout(MDBoxLayout):
+	def __init__(self, Id) -> None:
+		super(Detail_item_layout, self).__init__()
+		print(Id)
+		self.stock = database.detailItem(Id)
+		self.item_name.secondary_text = str(self.stock[1])
+		self.item_quantity.secondary_text = str(self.stock[2])
+		self.purchased_price.secondary_text = str(self.stock[3])
+		self.purchased_date.secondary_text = str(self.stock[4])
+		self.single_selling_price.secondary_text = str(self.stock[5])
+		self.bulk_selling_price.secondary_text = str(self.stock[6])
+		self.updated_at.secondary_text = str(self.stock[7])
 
 class Home(MDScreen):
 	"""
 	main home page
 	"""
+	#class Stock(MDScreen):
+		#"""
+		#Stock page
+		#"""
+	def __init__(self, **kwargs):
+		super(Home, self).__init__(**kwargs)
+		self.manager_open = False
+		self.item_manager = MDFileManager(
+			exit_manager=self.exit_manager,
+			select_path=self.select_item_path,
+		)
+	def select_item_path(self, path):
+		'''
+		It will be called when you click on the file name
+		or the catalog selection button.
+		'''
+		self.exit_manager()
+		# this is for the customer table
+		name, xtension = os.path.splitext(path)
+		if xtension == '.xlsx':
+			simplepath = path
+			wb_obj = openpyxl.load_workbook(path)
+			sheet_obj = wb_obj.active
+			row = sheet_obj.max_row
+			column = sheet_obj.max_column
+			itemFileList=[]
+			for i in range (2, row+1):
+				tempoTuple = []
+				for j in range(1, column+1):
+					cell_obj = sheet_obj.cell(row=i, column=j)
+					tempoTuple.append(cell_obj.value)
+				itemFileList.append(tempoTuple)
+			# here what i done is to change datetime type to str
+			# since when uploaded from XL it is datetime type
+			for x in itemFileList:
+				for a in x:
+					if type(a) == datetime:
+						x.insert(6, a.strftime("%d/%m/%y"))
+						x.pop(7)
+			for itemFi in itemFileList:
+				database.insertCustomer(itemFi[0], itemFi[1], itemFi[2], itemFi[3], itemFi[4], itemFi[5])
+			toast("Data recorded successfully")
+		else: 
+			"""
+			msg that says invalid extnsion only xlsx accpeted
+			"""
+			toast("Invalid file type only (.xlsx) type accepted")
 
-class Stock(MDScreen):
-	"""
-	Stock page
-	"""
+	def exit_manager(self, *args):
+		'''
+		Called when the user reaches the root of the directory tree
+		'''
+		self.manager_open = False
+		self.item_manager.close()			
 	def func(self):
-		print('Print Stock page')
+		"""
+		This function is to return the items table
+		"""
+		self.itemList = database.readSItem()
+		for x in self.itemList:
+			if x[2] <= 0:
+				availability = ("alert-circle", [1, 0, 0, 1], "No item")			
+			elif x[2] < 10:
+				availability = ("alert", [255/256, 165/256, 0, 1], "less than 10")
+			else:
+				availability = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "Available")
+			x.insert(2, availability)
 
+		self.stock_tables = MDDataTable(
+			pos_hint={'center_x': 0.5},
+			size_hint=(1, 1),
+			rows_num=100,
+			#use_pagination=False,
+			#background_color_header=main().theme_cls.bg_darkest,
+			#background_color_cell=main().theme_cls.bg_dark,
+			#background_color=main().theme_cls.bg_darkest,
+			elevation=3,
+			#rows_num=50,
+			column_data=[
+				("ID", dp(7)),
+				("Name", dp(14)),
+				("Availability", dp(22)),
+				("Qty", dp(10)),
+				("P_Price", dp(13)),
+				("S-Price", dp(13)),
+				("B-Price", dp(13))],
+			row_data=self.itemList,)
+		self.stock_tables.bind(on_row_press=self.item_row_selected)
+		newStockFile = MDFloatingActionButton(
+			icon="attachment",
+			pos_hint={'x': .8, 'y': .05},
+			on_release=self.uploadStockFromFile
+		)				
+		newStock = MDRaisedButton(
+			text="New",
+			icon="plus",
+			pos_hint={'x':.02, 'y': .03},
+			on_release=self.newStock
+			)
+		self.tock_tab.add_widget(self.stock_tables)
+		self.tock_tab.add_widget(newStock)
+		self.tock_tab.add_widget(newStockFile)
+
+	def item_row_selected(self, table, row):
+		"""
+		When row selected
+		"""
+		start_index, end_index = row.table.recycle_data[row.index]['range']
+		# this is to get the id since it is on the start_index
+		self.item_detail(row.table.recycle_data[start_index]["text"])
+
+	def item_detail(self, Id):
+		"""
+		dialog popup to display item detail
+		"""
+		#item = database.detailItem(Id)
+		self.item_detailPopup = MDDialog(
+			title="Item detail",
+			type="custom",
+			content_cls=Detail_item_layout(Id),
+			buttons=[
+				MDRaisedButton(
+					text="Edit",
+					on_press=self.editStock,
+				),
+				MDRaisedButton(
+					text="Delete"
+				)
+			]
+		)
+		self.item_detailPopup.open()
+	def editStock(self, *args):
+		print('Error: ', args[0])
+	def uploadStockFromFile(self, inst):
+		"""
+		uploading stock data from XL file
+		"""
+		path = os.path.expanduser("~")
+		self.item_manager.show(path)
+		self.manager_open = True
+	def newStock(self, inst):
+		"""
+		new individual stock
+		"""
+		self.dialogNewStock = MDDialog(
+			title="New Item",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_stock_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewStock
+				)
+			]
+		)
+		self.dialogNewStock.open()
+	def closeNewStock(self, inst):
+		#self.stock_tables.update_row_data(inst, self.itemList)
+		self.func()
+		self.dialogNewStock.dismiss()
 
 class DashBoard(MDScreen):
 	"""
@@ -127,7 +313,7 @@ class Sales(MDScreen):
 
 class CashFlow(MDScreen):
 	"""
-	Cash Flow page
+	Cash Flow pagecustomerItem
 	"""
 	pass
 

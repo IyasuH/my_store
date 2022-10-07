@@ -13,7 +13,7 @@ from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.datatables import MDDataTable
 from kivymd.uix.anchorlayout import MDAnchorLayout
-from kivymd.uix.button import MDFloatingActionButton, MDRectangleFlatIconButton, MDRaisedButton
+from kivymd.uix.button import MDFloatingActionButton, MDRectangleFlatIconButton, MDRaisedButton, MDIconButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.gridlayout import MDGridLayout
@@ -33,18 +33,30 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
 
 class MDashCard(MDCard):
-	#pass
+	"""
+	cards on the dashboard
+	"""
 	focu_color = ListProperty([1, 1, 1])
 	unfocu_color = ListProperty([1, 1, 1])
 	text1 = StringProperty("")
 	text2 = StringProperty("")
 	text3 = StringProperty("")
-	# canbe Icon (arrow-top-right, arrow-bottom-right)
+	# Icon (arrow-top-right, arrow-bottom-right)
 	updownIcon = StringProperty("")
 	# range b/n 0-100
 	cpbValue = NumericProperty(0)
 	cpbBarColor = ListProperty([1, 1, 1])
 
+class MDCustomCard(MDCard):
+	"""
+	Crads for Customers page
+	"""
+	customerName = StringProperty("")
+	companyName = StringProperty("")
+	customerTinNumber = StringProperty("")
+	customerPhoneNumber = StringProperty("")
+	totalPurchased = StringProperty(0)
+	itemPurchased = ListProperty([])
 
 class CircularProgressBar(AnchorLayout):
 	bar_color = ListProperty([1, 1, 1])
@@ -90,12 +102,12 @@ class New_customer_layout(MDBoxLayout):
 		"""
 		When Add button pressed in the new customer dialog
 		"""
-		if self.customer_name.text and self.customer_tin_number.text and self.customer_region.text and self.customer_sub_city.text and self.customer_wereda.text and self.customer_phone_number.text and self.customer_account_created_date.text and self.customer_frequency_of_purchase.text and self.customer_total_purchase.text and self.customer_bank_account_number.text:
+		if self.customer_name.text and self.company_name.text and self.customer_tin_number.text and self.customer_city.text and self.customer_phone_number.text and self.customer_account_created_date.text and self.customer_frequency_of_purchase.text and self.customer_total_purchase.text and self.customer_bank_account_number.text:
 			#print(self.customer_bank_account_number.text)
-			database.insertCustomer(self.customer_name.text,  self.customer_tin_number.text, self.customer_region.text, self.customer_sub_city.text, self.customer_wereda.text, self.customer_phone_number.text, self.customer_account_created_date.text, self.customer_frequency_of_purchase.text, self.customer_total_purchase.text, self.customer_bank_account_number.text)
-			print('now you can close the popUp msg')
+			database.insertCustomer(self.customer_name.text, self.company_name.text, self.customer_tin_number.text, self.customer_city.text, self.customer_phone_number.text, self.customer_account_created_date.text, self.customer_frequency_of_purchase.text, self.customer_total_purchase.text, self.customer_bank_account_number.text)
+			toast('now you can close the popUp msg')
 		else:
-			print('fill all info msg')
+			toast('fill all info msg')
 
 class New_stock_layout(MDBoxLayout):
 	"""
@@ -190,7 +202,7 @@ class Home(MDScreen):
 		'''
 		self.manager_open = False
 		self.item_manager.close()			
-	def func(self):
+	def stockFunc(self):
 		"""
 		This function is to return the items table
 		"""
@@ -224,9 +236,14 @@ class Home(MDScreen):
 				("B-Price", dp(13))],
 			row_data=self.itemList,)
 		self.stock_tables.bind(on_row_press=self.item_row_selected)
-		newStockFile = MDFloatingActionButton(
+		newStockFile = MDIconButton(
 			icon="attachment",
 			pos_hint={'x': .8, 'y': .05},
+			theme_icon_color="Custom",
+			icon_color='white',
+			md_bg_color='blue',
+			#set_radius=[50,50,50,50],
+			#rounded_button = True,
 			on_release=self.uploadStockFromFile
 		)				
 		newStock = MDRaisedButton(
@@ -267,8 +284,10 @@ class Home(MDScreen):
 			]
 		)
 		self.item_detailPopup.open()
+
 	def editStock(self, *args):
 		print('Error: ', args[0])
+
 	def uploadStockFromFile(self, inst):
 		"""
 		uploading stock data from XL file
@@ -296,8 +315,51 @@ class Home(MDScreen):
 		self.dialogNewStock.open()
 	def closeNewStock(self, inst):
 		#self.stock_tables.update_row_data(inst, self.itemList)
-		self.func()
+		self.stockFunc()
 		self.dialogNewStock.dismiss()
+
+	def customerFunc(self):
+		"""
+		When customer tab selected
+		"""
+		self.customerTab.clear_widgets()
+		customersList = database.readSCustomer()
+		for x in customersList:
+			self.customerTab.add_widget(MDCustomCard(
+				customerName = x[1],
+				companyName = x[2],
+				customerTinNumber = str(x[5]),
+				customerPhoneNumber = str(x[4]),
+				totalPurchased = str(x[6]),
+				#itemPurchased = database.read,
+			))
+			#self.customerTab.add_widget(customerCard)
+
+	def newCustomer(self):
+		"""
+		Adding new single customer to database
+		"""
+		print('on new customers')
+		self.dialogNewCustomer = MDDialog(
+			title="New Customer",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_customer_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewCustomer
+				),
+			]
+		)
+		self.dialogNewCustomer.open()
+	def closeNewCustomer(self, inst):
+		"""
+		close button in add new customer dialog
+		"""
+		self.dialogNewCustomer.dismiss()
+
 
 class DashBoard(MDScreen):
 	"""

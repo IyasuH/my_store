@@ -1,4 +1,74 @@
 #:kivy 2.1.0
+<New_customer_layout>:
+	customer_name: customer_name
+    company_name: company_name
+	customer_tin_number: customer_tin_number
+    customer_city: customer_city
+	customer_phone_number: customer_phone_number
+	customer_frequency_of_purchase: customer_frequency_of_purchase
+	customer_account_created_date: customer_account_created_date
+	customer_total_purchase: customer_total_purchase
+	customer_bank_account_number: customer_bank_account_number
+	id: new_customer_layout
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+	ScrollView:
+		smooth_scroll_end: 10
+		MDList:
+			spacing: "5dp"
+            MDTextField:
+                id: customer_name
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Customer Name'
+            MDTextField:
+                id: company_name
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Company Name'
+            MDTextField:
+                id: customer_tin_number
+                hint_text: "Tin Number"
+                multiline: False
+                mode: "rectangle"
+            MDTextField:
+                id: customer_city
+                hint_text: "Customer City"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: customer_phone_number
+                hint_text: "Phone Number"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: customer_account_created_date
+                hint_text: "Account Created Date"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: customer_frequency_of_purchase
+                hint_text: "Frequency of Purchase"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: customer_total_purchase
+                hint_text: "Total Purchase"
+                mode: "rectangle"
+                multiline: False
+            MDTextField:
+                id: customer_bank_account_number
+                hint_text: "Bank Account Number"
+                text: ''
+                mode: "rectangle"
+                multiline: False
+            MDRaisedButton:
+                text: 'Save'
+                on_release: root.addNewCustomer()
+
 <Detail_item_layout>
     id: detail_item_layout
     item_name: item_name
@@ -100,8 +170,87 @@
                 hint_text: 'Selling Price(Bulk)'
                 #text: '12'
             MDRaisedButton:
+            #divider: 'Inset'
                 text: 'Save'
                 on_release: root.addNewItem()
+
+<MDCustomCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '310dp', '250dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    elevation: 3
+    ripple_behavior: True
+    MDBoxLayout:
+        orientation: 'vertical'
+        TwoLineAvatarIconListItem:
+            id: customerCompanyName
+            markup: True
+            id: companyAndCustomerName
+            text: '[b]  '+root.companyName+'[/b]'
+            secondary_text: '   '+root.customerName
+            divider_color: app.theme_cls.primary_dark
+            radius: [15, 15, 0, 0]
+            elevation: 3
+            #tertiary_text: #customer_id
+            IconLeftWidget:
+                icon: "account-circle"
+                icon_size: "50sp"
+                theme_icon_color: "Custom"
+                disabled_color: app.theme_cls.primary_dark
+                disabled: True
+            IconRightWidget:
+                icon: "pencil-outline"
+                icon_size: "30sp"
+                theme_icon_color: "Custom"
+                icon_color: app.theme_cls.primary_dark
+                on_release:
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: "15sp"
+            MDList:
+                size_hint_x: .6
+                spacing: "7dp"
+                padding: "7dp"
+                MDRoundFlatIconButton:
+                    markup: True
+                    disabled: True
+                    #disabled_color: 
+                    line_color_disabled: (136/255, 0, 255/255, 0.82)
+                    icon: 'plus'
+                    halign: 'center'
+                    line_width: 1.5
+                    text: 'Phone Number\n'+root.customerPhoneNumber
+                MDRoundFlatIconButton:
+                    markup: True
+                    #disabled_color: "red"
+                    line_color_disabled: (187/255, 61/255, 255/255, 0.9)
+                    icon: 'plus'
+                    halign: 'center'
+                    line_width: 1.5
+                    disabled: True
+                    text: '   Tin Number   \n' + root.customerTinNumber
+                MDRoundFlatIconButton:
+                    markup: True
+                    #disabled_color: 
+                    line_color_disabled: (81/255, 120/255, 248/255, 0.7)
+                    icon: 'plus'
+                    halign: 'center'
+                    line_width: 1.5
+                    disabled: True
+                    text: 'Total Purchase\n' + root.totalPurchased
+                
+            ScrollView:
+                size_hint_x: .2
+                smooth_scroll_end: 10
+                MDList:
+                    id: itemPurchased
+                    spacing: "4dp"
+            
+
 
 <MDashCard>
     focus_behavior: True
@@ -172,6 +321,7 @@
 Home:
     name: "home"
     tock_tab: tock_tab
+    customerTab: customerTab
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -261,7 +411,7 @@ Home:
                 icon: 'poll'
                 text: 'Stock'
                 #icon: 'chart-box-outline'
-                on_tab_release: root.func()
+                on_tab_release: root.stockFunc()
                 MDBoxLayout:
                     orientation: 'vertical'
                     MDTopAppBar:
@@ -296,10 +446,29 @@ Home:
                 MDLabel:
                     text: 'Cash flow'
                     halign: 'center'
+
             MDBottomNavigationItem:
                 name: 'customer'
                 text: 'Customer'
                 icon: 'account-multiple-outline'
-                MDLabel:
-                    text: 'Customer'
-                    halign: 'center'
+                on_tab_release: root.customerFunc()
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    MDTopAppBar:
+                        widget_position: 'top'
+                        title: "Customers"
+                        left_action_items: [["sort-variant"]]
+                        right_action_items: [["plus", lambda x: root.newCustomer(), "Add"]]
+                        specific_text_color: app.theme_cls.opposite_bg_normal
+                        md_bg_color: app.theme_cls.bg_normal
+                        elevation: 1
+                    ScrollView:
+                        do_scroll_x: False
+                        smooth_scroll_end: 10    
+                        MDBoxLayout:
+                            id: customerTab
+                            adaptive_size: True
+                            padding: "10sp"
+                            spacing: "17sp"
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            orientation: 'vertical'

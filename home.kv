@@ -1,4 +1,108 @@
 #:kivy 2.1.0
+<Detail_item_layout>
+    id: detail_item_layout
+    item_name: item_name
+    item_quantity: item_quantity
+    purchased_price: purchased_price
+    purchased_date: purchased_date
+    single_selling_price: single_selling_price
+    bulk_selling_price: bulk_selling_price
+    updated_at: updated_at
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+    ScrollView:
+        smooth_scroll_end: 10
+        MDList:
+            TwoLineListItem:
+                id: item_name
+                text: 'Item Name'
+                secondary_text: ''
+            TwoLineListItem:
+                id: item_quantity
+                text: 'Quantity'
+                secondary_text: ''
+            TwoLineListItem:
+                id: purchased_price
+                text: 'Purchased Price'
+                secondary_text: ''
+            TwoLineListItem:
+                id: purchased_date
+                text: 'Purchased Date'
+                secondary_text: ''
+            TwoLineListItem:
+                id: single_selling_price
+                text: 'Single Selling Price'
+                secondary_text: ''
+            TwoLineListItem:
+                id: bulk_selling_price
+                text: 'Bulk Selling Price'
+                secondary_text: ''
+            TwoLineListItem:
+                id: updated_at
+                text: 'Updated at'
+                secondary_text: ''
+           
+
+<New_stock_layout>
+	id: new_stock_layout
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+    item_name: item_name
+    item_quantity: item_quantity
+    purchased_price: purchased_price
+    purchased_date: purchased_date
+    selling_price_single: selling_price_single
+    selling_price_bulk: selling_price_bulk
+	height: "400dp"
+    ScrollView:
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "4dp"
+            MDTextField:
+                id: item_name
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Item Name'
+                #text: 'yellow pigment'
+            MDTextField:
+                id: item_quantity
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Item Quantity'
+                #text: '5'
+            MDTextField:
+                id: purchased_price
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Purchased Price'
+                #text: '10'
+            MDTextField:
+                id: purchased_date
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Purchased date'			
+                #text: '6/10/2022'
+            MDTextField:
+                id: selling_price_single
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Selling Price(single)'
+                #text: '15'
+            MDTextField:
+                id: selling_price_bulk
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Selling Price(Bulk)'
+                #text: '12'
+            MDRaisedButton:
+                text: 'Save'
+                on_release: root.addNewItem()
+
 <MDashCard>
     focus_behavior: True
     size_hint: None, None
@@ -67,6 +171,7 @@
 
 Home:
     name: "home"
+    tock_tab: tock_tab
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -93,8 +198,7 @@ Home:
                                 elevation: 1
                             ScrollView:
                                 do_scroll_x: False
-                                scroll_distance: 30
-                                scroll_timeout: 80
+                                smooth_scroll_end: 10
                                 MDBoxLayout:
                                     adaptive_size: True
                                     padding: "10sp"
@@ -152,36 +256,30 @@ Home:
                                         cpbValue: 22
                                         cpbBarColor: [1, 0, 100/255]
 
-
-                                    
-                                    #RecycleView:
-                                        #id: profitCards
-                                        #size_hint_x: None
-                                        #width: root.width * 95 / 100
-                                        #size_hint: 1, 1 
-                                        #pos_hint: {"center_x": .5}
-                                        #bar_width: 0
-                                        #key_viewclass: 'viewclass'
-                                        #key_size: 'height'
-                                        #RecycleGridLayout:
-                                            #cols: 2
-                                            #padding: dp(10)
-                                            #spacing: dp(24)
-                                            #default_size: None, dp(200)
-                                            #default_size_hint: 1, None
-                                            #size_hint_y: None
-                                            #height: self.minimum_height
             MDBottomNavigationItem:
                 name: 'stock'
+                icon: 'poll'
                 text: 'Stock'
                 #icon: 'chart-box-outline'
-                icon: 'poll'
-                on_tab_touch_down: Stock.func(Stock())
-                Stock:
-                    MDScreen:
-                        MDLabel:
-                            text: 'Stock'
-                            haDashboardlign: 'center'
+                on_tab_release: root.func()
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    MDTopAppBar:
+                        widget_position: 'top'
+                        title: "Stock"
+                        left_action_items: [["sort-variant"]]
+                        right_action_items: [["tune-variant"]]
+                        specific_text_color: app.theme_cls.opposite_bg_normal
+                        md_bg_color: app.theme_cls.bg_normal
+                        elevation: 1
+                    MDFloatLayout:
+                        id: tock_tab
+                        md_bg_color: app.theme_cls.bg_normal
+
+                #Stock:
+                    #stock_tab: stock_tab
+                    #MDScreen:
+                        #id: stock_tab    
                     
             MDBottomNavigationItem:
                 name: 'sales'

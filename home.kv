@@ -1,4 +1,61 @@
 #:kivy 2.1.0
+<New_sales_layout>
+	id: new_sales_layout
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+    item_id: item_id
+    customer_id: customer_id
+    item_quantitiy: item_quantitiy
+    sold_date: sold_date
+    way_of_payment: way_of_payment
+    sales_revenue: sales_revenue
+	ScrollView:
+		smooth_scroll_end: 10
+		MDList:
+			spacing: "5dp"
+            MDTextField:
+                # here make here to select from dropDown list
+                # or to add it CORRECTLY manualy then search for it in the code
+                id: item_id
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'item id'
+            MDTextField:
+                # here make here to select from dropDown list
+                # or to add it CORRECTLY manualy then search for it in the code
+                id: customer_id
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'customer id'
+            MDTextField:
+                id: item_quantitiy
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Quanitity'
+            MDTextField:
+                id: sold_date
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Date(dd/mm/yy)'
+            MDTextField:
+                id: way_of_payment
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Way of Payment(Bank, Cash)'
+            MDTextField:
+                id: sales_revenue
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Sales Revenue'
+            MDRaisedButton:
+            #divider: 'Inset'
+                text: 'Save'
+                on_release: root.addNewSales()
+            
+
 <New_customer_layout>:
 	customer_name: customer_name
     company_name: company_name
@@ -114,7 +171,7 @@
                 id: updated_at
                 text: 'Updated at'
                 secondary_text: ''
-           
+
 
 <New_stock_layout>
 	id: new_stock_layout
@@ -173,6 +230,39 @@
             #divider: 'Inset'
                 text: 'Save'
                 on_release: root.addNewItem()
+
+<MDSalesCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '295dp', '50dp'
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    ripple_behavior: True
+    MDBoxLayout:
+        orientation: "horizontal"
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        padding: 10
+        spacing: "5sp"
+        MDTextButton:
+            id: salesName
+            size_hint_x: .25
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.salesName
+        MDTextButton:
+            id: salesQty
+            size_hint_x: .25
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.salesQty
+        MDTextButton:
+            id: salesAmount
+            size_hint_x: .25
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.salesAmount
+        MDTextButton:
+            id: salesDate
+            size_hint_x: .25
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.salesDate
+
 
 <MDCustomCard>
     focus_behavior: True
@@ -322,6 +412,7 @@ Home:
     name: "home"
     tock_tab: tock_tab
     customerTab: customerTab
+    salesTab: salesTab
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -371,7 +462,7 @@ Home:
                                         unfocu_color: 1, 0, 100/255, .15
                                         text1: 'Sales'
                                         text2: '$40000'
-                                        text3: 'Total Profit This Month'
+                                        text3: 'Total Sales This Month'
                                         updownIcon: 'arrow-top-right'
                                         cpbValue: 37
                                         cpbBarColor: [250/255, 115/255, 0]
@@ -391,7 +482,7 @@ Home:
                                         unfocu_color: 1, 0, 100/255, .15
                                         text1: 'Customers'
                                         text2: '40000'
-                                        text3: 'Total Profit This Month'
+                                        text3: 'New customers this month'
                                         updownIcon: 'arrow-top-right'
                                         cpbValue: 67
                                         cpbBarColor: [0, 163/255, 250/255]
@@ -401,17 +492,21 @@ Home:
                                         unfocu_color: 1, 0, 100/255, .15
                                         text1: 'Expense'
                                         text2: '$40000'
-                                        text3: 'Total Profit This Month'
+                                        text3: 'Total expense This Month'
                                         updownIcon: 'arrow-bottom-right'
                                         cpbValue: 22
                                         cpbBarColor: [1, 0, 100/255]
+                                        on_release: 
+                                            root.manager.transition.direction = "left"
+                                            root.manager.current = "expense"
+
 
             MDBottomNavigationItem:
                 name: 'stock'
                 icon: 'poll'
                 text: 'Stock'
                 #icon: 'chart-box-outline'
-                on_tab_release: root.stockFunc()
+                #on_tab_release: root.stockFunc()
                 MDBoxLayout:
                     orientation: 'vertical'
                     MDTopAppBar:
@@ -436,9 +531,92 @@ Home:
                 text: 'Sales'
                 #icon: 'chart-timeline-variant'
                 icon: 'trending-up'
-                MDLabel:
-                    text: 'Slaes'
-                    halign: 'center'
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    MDTopAppBar:
+                        widget_position: 'top'
+                        title: "Sales"
+                        left_action_items: [["sort-variant"]]
+                        right_action_items: [["plus", lambda x: root.newSales(), "Add"]]
+                        specific_text_color: app.theme_cls.opposite_bg_normal
+                        md_bg_color: app.theme_cls.bg_normal
+                        elevation: 1
+                    MDCard:
+                        focus_behavior: True
+                        size_hint: None, None
+                        size: '310dp', '30dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        elevation: 1
+
+                        OneLineAvatarIconListItem:
+                            id: monthDropDownMenuCaller
+                            markup: True
+                            text: 'October'
+                            radius: [15,15,15,15]
+                            valign: 'center'
+                            pos_hint: {'center_y': .5}
+                            divider: None
+                            #divider_color: app.theme_cls.primary_dark
+                            #size_hint_y: .18
+                            IconRightWidget:
+                                icon: "chevron-down"
+                                icon_size: "30sp"
+                                theme_icon_color: "Custom"
+                                icon_color: app.theme_cls.primary_dark
+                                on_release: root.main_monthMenu.open()
+
+                    MDCard:
+                        focus_behavior: True
+                        size_hint: None, None
+                        size: '310dp', '420dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5}
+                        elevation: 3
+                        #ripple_behavior: True
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            MDBoxLayout:
+                                orientation: "horizontal"
+                                size_hint_y: .2
+                                pos_hint: {'center_x': .5}
+                                spacing: 10
+                                radius: [0,0,15,15]
+                                padding: 10
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .25
+                                    text: 'Item'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .25
+                                    text: 'Qty'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .25
+                                    text: 'Amount'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .25
+                                    text: 'Date'
+                            ScrollView:
+                                do_scroll_x: False
+                                smooth_scroll_end: 10
+                                size_hint_y: .8
+                                MDBoxLayout:
+                                    id: salesTab
+                                    adaptive_size: True
+                                    padding: "10sp"
+                                    spacing: "7sp"
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    orientation: 'vertical'
+                    
+
             MDBottomNavigationItem:
                 name: 'cashFlow'
                 text: 'Cash'
@@ -451,7 +629,7 @@ Home:
                 name: 'customer'
                 text: 'Customer'
                 icon: 'account-multiple-outline'
-                on_tab_release: root.customerFunc()
+                #on_tab_release: root.customerFunc()
                 MDBoxLayout:
                     orientation: 'vertical'
                     MDTopAppBar:

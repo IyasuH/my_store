@@ -12,6 +12,21 @@ def createTables():
 
 # here performing basic CRUD
 # create
+
+def insertBankAcc(bName, bAmount, bCreated_at, bUpdated_at):
+    """
+    insert for bankAccount tables
+    """
+    c.execute("insert into bankAcc(bankName, amount, created_at, updated_at) values(?, ?, ?, ?)", (bName, bAmount, bCreated_at, bUpdated_at))
+    conn.commit()
+
+def insertXpense(eType, eName, eAmount, eDate):
+    """
+    insert function for expense table
+    """
+    c.execute("insert into expenses(type, name, amount, date) values(?, ?, ?, ?)", (eType, eName, eAmount, eDate))
+    conn.commit()
+
 def insertCustomer(cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
     """
     insert function for customers table
@@ -34,10 +49,26 @@ def insertSales(itemId, customerId, itemQuantity, soldDate, paymentWay, salesRev
     """
     insert function for sales table
     """
-    c.execute("INSERT INTO sales(itemId, customerId, itemQuantity, soldDate, wayOfPayment, salesRevenue) VALUES(?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue))
+    c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, wayOfPayment, salesRevenue) VALUES(?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue))
     conn.commit()
 
 # read
+def readBankAcc():
+    """
+    to read bankAcc
+    """
+    c.execute("SELECT * FROM bankAcc")
+    banks = c.fetchall()
+    return banks
+
+def readSomeExpenses():
+    """
+    To only read name, amount and date of expenses
+    """
+    c.execute("SELECT type, name, amount, date FROM expenses")
+    expense = c.fetchall()
+    return expense
+
 def readCustomer():
     """
     read Customer table
@@ -92,6 +123,16 @@ def readSItem():
         #if x[2] < 
     return cToList
 
+def readSomeSales():
+    """
+    some amount of sales
+    """
+    c.execute("SELECT itemId, itemQuantitiy, salesRevenue, soldDate FROM sales")
+    sales = c.fetchall()
+    cToList = []
+    for x in sales:
+        cToList.append(list(x))
+    return cToList
 
 def readSales():
     """
@@ -110,20 +151,40 @@ def readCustomerSales(Id):
     return customerSales
 
 # update
-def updateCustomer(cId, cName, cTinNumber, cRegion, cSubcity, cWereda, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
+def updateCustomer(cId, cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
     """
     updates customer database
     """
+    c.execuste("UPDATE customers SET customerName = ?, companyName = ?, customerTinNumber = ?, customerCity = ?, customerPhoneN = ?, accountCreatedDate = ?, frequencyOfPurchase = ?, totalPurchase = ?, bankAccountNumber = ? WHERE customerId = ?", (cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc, cId))
+    conn.commit()
 
-def updateItem(iId, iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, updatedAt):
+def updateItem(iId, iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk):
     """
     update item database
     """
+    c.execute("UPDATE inventory SET itemName = ?, itemQuantity = ?, purchasedPrice = ?, purchasedDate = ?, sellingPriceCherecharo = ?, sellingPriceBulk = ?, updatedAt = ? WEHRE itemID = ?", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, iId))
+    conn.commit()
 
 def updateSales(sId, itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue):
     """
     update sales database
     """
+    c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantity = ?, soldDate = ?, wayOfPayment = ?, salesRevenue = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, sId))
+    conn.commit()
+
+def updateExpenses(eId, eType, eName, eAmount, eDate):
+    """
+    update expenses database
+    """
+    c.execute("UPDATE expenses SET type = ?, name = ?, amount = ?, date = ? WHERE id = ?", (eType, eName, eAmount, eDate, eId))
+    conn.commit()
+
+def updateBankAcc(bId, bName, bAmount, bCreated_at, bUpdated_at):
+    """
+    update bankAcc
+    """
+    c.execute("UPDATE bankAcc SET bankName = ?, amount = ?, created_at = ?, updated_at = ? WHERE id = ?", (bName, bAmount, bCreated_at, bUpdated_at, bId))
+    conn.commit()
 
 # delete
 def deleteCustomer(cId):
@@ -149,6 +210,20 @@ def deleteSales(sId):
     """
     c.execute("DELETE from sales where salesId = ?", (sId))
     print("Deleted")
+    conn.commit()
+
+def deleteExpenses(eId):
+    """
+    delete Expenses with id eId
+    """
+    c.execute("DELETE from expenses where id = ?", (eId))
+    conn.commit()
+
+def deleteBankAcc(bId):
+    """
+    delete bankAcc with id bId
+    """
+    c.execute("DELETE from bankAcc where id = ?", (bId))
     conn.commit()
 
 def closeCursor():

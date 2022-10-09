@@ -2,7 +2,6 @@
 """
 STOCK managment
 """
-from dis import Instruction
 from kivy.lang import Builder
 from kivymd.uix.screen import MDScreen
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -31,6 +30,7 @@ from kivymd.uix.behaviors import RoundedRectangularElevationBehavior
 from kivymd.uix.card import MDCard
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
+from kivymd.uix.menu import MDDropdownMenu
 
 class MDashCard(MDCard):
 	"""
@@ -46,6 +46,33 @@ class MDashCard(MDCard):
 	# range b/n 0-100
 	cpbValue = NumericProperty(0)
 	cpbBarColor = ListProperty([1, 1, 1])
+
+class MDXpense(MDCard):
+	"""
+	Single expense item card
+	For now it is going only to have three values
+		Item - Expense name
+		Amount - Expense Amount
+		Date - date where expense made
+	"""
+	expenseName = StringProperty("")
+	expenseAmount = StringProperty("")
+	expenseDate = StringProperty("")
+
+class MDSalesCard(MDCard):
+	"""
+	Single sales item card
+	For now it is going only to have three values
+		Item - Sales Item Name
+		Qty - Quantity
+		amount - amount gained (qty*single value)value
+		date - when sales made	
+	"""
+	salesName = StringProperty("")
+	salesQty = StringProperty("")
+	salesAmount = StringProperty("")
+	salesDate = StringProperty("")
+
 
 class MDCustomCard(MDCard):
 	"""
@@ -84,12 +111,47 @@ class CircularProgressBar(AnchorLayout):
 			Clock.unschedule(self.percent_counter)
 
 # comment this out before deploying
-Window.size = (327, 580)
+Window.size = (327, 585)
 class Tab(MDFloatLayout, MDTabsBase):
 	"""
 	Tab class
 	"""
 	pass
+
+class New_Var_Expense_layout(MDBoxLayout):
+	"""
+	PopUP window to add new variable expenses
+	"""
+	def __init__(self) -> None:
+		super(New_Var_Expense_layout, self).__init__()
+	def addNewVarExpense(self):
+		"""
+		Save Fixed Expense
+		"""
+		if self.varExpenseItem.text and self.varExpenseAmount.text and self.varExpenseDate.text:
+			type = "Variable"
+			database.insertXpense(type, str(self.varExpenseItem.text), str(self.varExpenseAmount.text), str(self.varExpenseDate.text))
+			toast("Data saved now you can close")
+		else:
+			toast("Fill all the information")	
+
+
+class New_FExpense_layout(MDBoxLayout):
+	"""
+	PopUp window to add new fixed expenses
+	"""
+	def __init__(self) -> None:
+		super(New_FExpense_layout, self).__init__()
+	def addNewFExpense(self):
+		"""
+		Save Fixed Expense
+		"""
+		if self.fExpenseItem.text and self.fExpenseAmount.text and self.fExpenseDate.text:
+			type = "Fixed"
+			database.insertXpense(type, str(self.fExpenseItem.text), str(self.fExpenseAmount.text), str(self.fExpenseDate.text))
+			toast("Data saved now you can close")
+		else:
+			toast("Fill all the information")
 
 class New_customer_layout(MDBoxLayout):
 	"""
@@ -108,6 +170,24 @@ class New_customer_layout(MDBoxLayout):
 			toast('now you can close the popUp msg')
 		else:
 			toast('fill all info msg')
+
+class New_sales_layout(MDBoxLayout):
+	"""
+	PopUp window to add new sales
+	"""
+	def __init__(self) -> None:
+		super(New_sales_layout, self).__init__()
+	def addNewSales(self):
+		"""
+		When Add button pressed in the new customer dialog
+		"""
+		if self.item_id.text and self.customer_id.text and self.item_quantitiy.text and self.sold_date.text and self.way_of_payment.text and self.sales_revenue.text:
+			#print(self.customer_bank_account_number.text)
+			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.way_of_payment.text, self.sales_revenue.text)
+			toast('now you can close the popUp msg')
+		else:
+			toast('fill all info msg')
+
 
 class New_stock_layout(MDBoxLayout):
 	"""
@@ -159,6 +239,124 @@ class Home(MDScreen):
 			exit_manager=self.exit_manager,
 			select_path=self.select_item_path,
 		)
+	def on_enter(self):
+		self.itemList = database.readSItem()
+		for x in self.itemList:
+			if x[2] <= 0:
+				availability = ("alert-circle", [1, 0, 0, 1], "No item")			
+			elif x[2] < 10:
+				availability = ("alert", [255/256, 165/256, 0, 1], "less than 10")
+			else:
+				availability = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "Available")
+			x.insert(2, availability)
+
+		####THIS IS FOR THE STOCK TAB TO LOAD THE MDDataTable AND Buttons####
+
+		self.stock_tables = MDDataTable(
+			pos_hint={'center_x': 0.5},
+			size_hint=(1, 1),
+			rows_num=100,
+			#use_pagination=False,
+			#background_color_header=main().theme_cls.bg_darkest,
+			#background_color_cell=main().theme_cls.bg_dark,
+			#background_color=main().theme_cls.bg_darkest,
+			elevation=3,
+			#rows_num=50,
+			column_data=[
+				("ID", dp(7)),
+				("Name", dp(14)),
+				("Availability", dp(22)),
+				("Qty", dp(10)),
+				("P_Price", dp(13)),
+				("S-Price", dp(13)),
+				("B-Price", dp(13))],
+			row_data=self.itemList,)
+		self.stock_tables.bind(on_row_press=self.item_row_selected)
+		newStockFile = MDIconButton(
+			icon="attachment",
+			pos_hint={'x': .8, 'y': .05},
+			theme_icon_color="Custom",
+			icon_color='white',
+			md_bg_color='blue',
+			#set_radius=[50,50,50,50],
+			#rounded_button = True,
+			on_release=self.uploadStockFromFile
+		)				
+		newStock = MDRaisedButton(
+			text="New",
+			icon="plus",
+			pos_hint={'x':.02, 'y': .03},
+			on_release=self.newStock
+			)
+		self.tock_tab.add_widget(self.stock_tables)
+		self.tock_tab.add_widget(newStock)
+		self.tock_tab.add_widget(newStockFile)
+
+		#####################################################
+		####THIS FOR STOCK TAB TO LOAD THE CUSTOMER CARDS####
+
+		self.customerTab.clear_widgets()
+		customersList = database.readSCustomer()
+		for x in customersList:
+			self.customerTab.add_widget(MDCustomCard(
+				customerName = x[1],
+				companyName = x[2],
+				customerTinNumber = str(x[5]),
+				customerPhoneNumber = str(x[4]),
+				totalPurchased = str(x[6]),
+				#itemPurchased = database.read,
+			))
+			#self.customerTab.add_widget(customerCard)
+
+		####################################################
+		#####THIS FOR SALES TAB TO LOAD THE CUSTOM TABLE####
+
+		self.salesTab.clear_widgets()
+		# here to made filter based on month
+		allSales = database.readSomeSales()
+		itemName=[]
+		# here what i do is to convert itemId to itemName
+		
+		for x in allSales:
+			itemName.append(database.detailItem(x[0])[1])
+		y = 0
+		for x in allSales:
+			x[0] = itemName[y]
+			y += 1
+
+		for x in allSales:
+			self.salesTab.add_widget(MDSalesCard(
+				salesName = str(x[0]),
+				salesQty = str(x[1]),
+				salesAmount = str(x[2]),
+				salesDate = str(x[3])
+			))
+
+	def newSales(self):
+		"""
+		Adding new single sales to database
+		"""
+		self.dialogNewSales = MDDialog(
+			title="New Sales",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_sales_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewSales
+				),
+			]
+		)
+		self.dialogNewSales.open()
+	def closeNewSales(self, inst):
+		"""
+		close button in add new sales dialog
+		"""
+		self.dialogNewSales.dismiss()
+		self.on_enter()
+
 	def select_item_path(self, path):
 		'''
 		It will be called when you click on the file name
@@ -318,7 +516,7 @@ class Home(MDScreen):
 		self.stockFunc()
 		self.dialogNewStock.dismiss()
 
-	def customerFunc(self):
+	'''def customerFunc(self):
 		"""
 		When customer tab selected
 		"""
@@ -333,7 +531,7 @@ class Home(MDScreen):
 				totalPurchased = str(x[6]),
 				#itemPurchased = database.read,
 			))
-			#self.customerTab.add_widget(customerCard)
+			#self.customerTab.add_widget(customerCard)'''
 
 	def newCustomer(self):
 		"""
@@ -360,6 +558,120 @@ class Home(MDScreen):
 		"""
 		self.dialogNewCustomer.dismiss()
 
+
+class Expneses(MDScreen):
+	"""
+	Expense page
+	"""
+	def __init__(self, **kwargs):
+		"""
+		Drop down monthMenu
+		"""
+		super().__init__(**kwargs)
+	def monthMenu_callback(self, selMonth):
+		"""
+		When month selected
+		"""
+		self.monthDropDownMenuCaller.text=selMonth
+
+	def on_enter(self):
+		"""
+		Whene entered to expenses
+			# select name,amount,date from expenses (also check by type so type too)
+		"""
+		self.fixedExpenses.clear_widgets()
+		self.variableExpenses.clear_widgets()
+		# here to made filter based on month
+		allExpense = database.readSomeExpenses
+		fixed = []
+		variable = []
+		print(allExpense)
+
+		for x in allExpense():
+			if x[0] == 'Fixed':
+				fixed.append(x)
+			else:
+				variable.append(x)
+
+		for x in fixed:
+			self.fixedExpenses.add_widget(MDXpense(
+				expenseName = str(x[1]),
+				expenseAmount = str(x[2]),
+				expenseDate = str(x[3])
+			))
+
+		for x in variable:
+			self.variableExpenses.add_widget(MDXpense(
+				expenseName = str(x[1]),
+				expenseAmount = str(x[2]),
+				expenseDate = str(x[3])
+			))
+		##################
+		months=["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+		monthMenu_items = [
+			{
+				"viewclass": "OneLineListItem",
+				"text": f"{i}",
+				"height": dp(33),
+				"on_release": lambda x=f"{i}": self.monthMenu_callback(x)
+			}for i in months
+		]
+		self.main_monthMenu = MDDropdownMenu(
+			items=monthMenu_items,
+			caller=self.monthDropDownMenuCaller,
+			width_mult=1.5,
+		)
+
+	def addFixedE(self):
+		"""
+		Add Fixed Expense
+		so here we mddialog where other expense details filled
+			except for the type that since that is fixed
+		"""
+		self.dialogNewFExpense = MDDialog(
+			title="New Fixed Expense",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_FExpense_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewFExpense
+				),
+			]
+		)
+		self.dialogNewFExpense.open()
+
+	def addVarE(self):
+		"""
+		Add Fixed Expense
+		so here we mddialog where other expense details filled
+			except for the type that since that is fixed
+		"""
+		self.dialogNewVarExpense = MDDialog(
+			title="New Variable Expense",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_Var_Expense_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewVarExpense
+				),
+			]
+		)
+		self.dialogNewVarExpense.open()
+
+
+	def closeNewFExpense(self, inst):
+		self.dialogNewFExpense.dismiss()
+		self.on_enter()
+
+	def closeNewVarExpense(self, inst):
+		self.dialogNewVarExpense.dismiss()
+		self.on_enter()
 
 class DashBoard(MDScreen):
 	"""
@@ -630,10 +942,16 @@ class main(MDApp):
 		self.theme_cls.primary_palette = 'Blue'
 		self.theme_cls.material_style ="M3"
 		screen_manager = ScreenManager()
-		#screen_manager.add_widget(Builder.load_file("stock.kv"))
 		screen_manager.add_widget(Builder.load_file("home.kv"))
+		screen_manager.add_widget(Builder.load_file("expenses.kv"))
 		return screen_manager
-		
+
+	def backHome(self):
+		"""
+		This method is to go back to home
+		"""
+		self.root.transition.direction = "right"
+		self.root.current = "home"
 
 if __name__ == "__main__":
 	main().run()

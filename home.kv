@@ -7,11 +7,12 @@
 	size_hint_y: None
 	height: "400dp"
     item_id: item_id
-    customer_id: customer_id
+    customer_id: t
     item_quantitiy: item_quantitiy
     sold_date: sold_date
     way_of_payment: way_of_payment
     sales_revenue: sales_revenue
+    bank_name: bank_name
 	ScrollView:
 		smooth_scroll_end: 10
 		MDList:
@@ -24,7 +25,7 @@
                 mode: "rectangle"
                 hint_text: 'item id'
             MDTextField:
-                # here make here to select from dropDown list
+                # here mtake here to select from dropDown list
                 # or to add it CORRECTLY manualy then search for it in the code
                 id: customer_id
                 multiline: False
@@ -45,6 +46,11 @@
                 multiline: False
                 mode: "rectangle"
                 hint_text: 'Way of Payment(Bank, Cash)'
+            MDTextField:
+                id: bank_name
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Bank Name(if in cash add None)'
             MDTextField:
                 id: sales_revenue
                 multiline: False
@@ -433,7 +439,7 @@ Home:
                                 widget_position: 'top'
                                 title: "DashBoard"
                                 left_action_items: [["sort-variant"]]
-                                right_action_items: [["tune-variant"]]
+                                right_action_items: [["tune-variant", lambda x:app.gotoSetting(), "Settings"]]
                                 specific_text_color: app.theme_cls.opposite_bg_normal
                                 md_bg_color: app.theme_cls.bg_normal
                                 elevation: 1
@@ -447,6 +453,7 @@ Home:
                                     orientation: 'vertical'
                                     pos_hint: {"center_x": .5, "center_y": .5}
                                     MDLabel:
+                                        markup: True
                                         text: 'Hello Bety'
                                         bold: True
                                         font_size: '28sp'
@@ -462,7 +469,7 @@ Home:
                                         unfocu_color: 1, 0, 100/255, .15
                                         text1: 'Sales'
                                         text2: '$40000'
-                                        text3: 'Total Sales This Month'
+                                        text3: 'New Sales This Month'
                                         updownIcon: 'arrow-top-right'
                                         cpbValue: 37
                                         cpbBarColor: [250/255, 115/255, 0]

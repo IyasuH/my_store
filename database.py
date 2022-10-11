@@ -61,6 +61,23 @@ def readBankAcc():
     banks = c.fetchall()
     return banks
 
+def detailBankAcc(bankName):
+    """
+    detail bankAcc using bank name
+    """
+    c.execute("SELECT * FROM bankAcc WHERE bankName=?", (bankName,))
+    bank = c.fetchone()
+    return bank
+
+def detailBankAccId(bankId):
+    """
+    detail bank using bank id
+    """
+    c.execute("SELECT * FROM bankAcc WHERE id=?", (bankId,))
+    bank = c.fetchone()
+    return bank
+
+
 def readSomeExpenses():
     """
     To only read name, amount and date of expenses
@@ -146,7 +163,7 @@ def readCustomerSales(Id):
     """
     sales made by specific customer
     """
-    c.execute("SELECT * FROM sales where customerId = ?", (Id))
+    c.execute("SELECT * FROM sales where customerId = ?", (Id, ))
     customerSales = c.fetchall()
     return customerSales
 
@@ -165,11 +182,11 @@ def updateItem(iId, iName, iQuantity,  purchasedPrice, purchasedDate, priceChere
     c.execute("UPDATE inventory SET itemName = ?, itemQuantity = ?, purchasedPrice = ?, purchasedDate = ?, sellingPriceCherecharo = ?, sellingPriceBulk = ?, updatedAt = ? WEHRE itemID = ?", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, iId))
     conn.commit()
 
-def updateSales(sId, itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue):
+def updateSales(sId, itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, bankName):
     """
     update sales database
     """
-    c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantity = ?, soldDate = ?, wayOfPayment = ?, salesRevenue = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, sId))
+    c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantity = ?, soldDate = ?, wayOfPayment = ?, salesRevenue = ?, bankName = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, sId, bankName))
     conn.commit()
 
 def updateExpenses(eId, eType, eName, eAmount, eDate):
@@ -191,7 +208,7 @@ def deleteCustomer(cId):
     """
     deleteCustomer row with id cId
     """
-    c.execute("DELETE from customers where customerId = ?", (cId))
+    c.execute("DELETE from customers where customerId = ?", (cId, ))
     print("Deleted")
     conn.commit()
 
@@ -200,7 +217,7 @@ def deleteItem(iId):
     """
     deleteItem row with id iId
     """
-    c.execute("DELETE from inventory where itemId = ?", (iId))
+    c.execute("DELETE from inventory where itemId = ?", (iId, ))
     print("Deleted")
     conn.commit()
 
@@ -208,7 +225,7 @@ def deleteSales(sId):
     """
     deleteSales row with id sId
     """
-    c.execute("DELETE from sales where salesId = ?", (sId))
+    c.execute("DELETE from sales where salesId = ?", (sId, ))
     print("Deleted")
     conn.commit()
 
@@ -216,14 +233,14 @@ def deleteExpenses(eId):
     """
     delete Expenses with id eId
     """
-    c.execute("DELETE from expenses where id = ?", (eId))
+    c.execute("DELETE from expenses where id = ?", (eId, ))
     conn.commit()
 
 def deleteBankAcc(bId):
     """
     delete bankAcc with id bId
     """
-    c.execute("DELETE from bankAcc where id = ?", (bId))
+    c.execute("DELETE from bankAcc where id = ?", (bId, ))
     conn.commit()
 
 def closeCursor():

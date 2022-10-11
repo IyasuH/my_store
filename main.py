@@ -6,18 +6,19 @@ from kivy.lang import Builder
 from kivymd.uix.screen import MDScreen
 from kivy.uix.screenmanager import Screen, ScreenManager
 from datetime import datetime
+from datetime import date
 from kivymd.app import MDApp
 #from kivymd.tools.hotreload.app import MDApp
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.tab import MDTabsBase
 from kivymd.uix.datatables import MDDataTable
 from kivymd.uix.anchorlayout import MDAnchorLayout
-from kivymd.uix.button import MDFloatingActionButton, MDRectangleFlatIconButton, MDRaisedButton, MDIconButton
+from kivymd.uix.button import MDFloatingActionButton, MDRectangleFlatIconButton, MDRaisedButton, MDIconButton, MDFlatButton
 from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.filemanager import MDFileManager
-from kivymd.uix.list import TwoLineAvatarListItem
+from kivymd.uix.list import TwoLineAvatarListItem, ThreeLineAvatarIconListItem
 from kivymd.uix.dialog import MDDialog
 from kivymd.toast import toast
 from kivy.metrics import dp
@@ -27,10 +28,11 @@ import database
 import openpyxl
 from kivy.properties import ListProperty, NumericProperty, StringProperty
 from kivymd.uix.behaviors import RoundedRectangularElevationBehavior
-from kivymd.uix.card import MDCard
+from kivymd.uix.card import MDCard, MDCardSwipe
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.textfield.textfield import MDTextField
 
 class MDashCard(MDCard):
 	"""
@@ -86,6 +88,9 @@ class MDCustomCard(MDCard):
 	itemPurchased = ListProperty([])
 
 class CircularProgressBar(AnchorLayout):
+	"""
+	Circular progressbar
+	"""
 	bar_color = ListProperty([1, 1, 1])
 	bar_width = NumericProperty(2.5)
 	# where this value is the percent for the progress bar
@@ -112,11 +117,153 @@ class CircularProgressBar(AnchorLayout):
 
 # comment this out before deploying
 Window.size = (327, 585)
-class Tab(MDFloatLayout, MDTabsBase):
+
+class Bank_list_item(MDCardSwipe):
 	"""
-	Tab class
+	Bank list items
 	"""
-	pass
+	bankName = StringProperty("")
+	bankAccountCreatedAt = StringProperty("")
+	bankAmount = StringProperty("")
+	bankId = NumericProperty(0)
+	icon = StringProperty("")
+	def __init__(self, *args, **kwargs):
+		super(Bank_list_item, self).__init__(**kwargs)
+	def deleteAccount(self, bankId):
+		"""
+		delete call method
+		"""
+		self.dialogDeleteBank = MDDialog(
+			title="Are You Sure?",
+			text="You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteBank
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteBank
+				)
+			]
+		)
+		self.dialogDeleteBank.open()
+	def cancleDeleteBank(self, *args):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteBank.dismiss()
+
+	def sureDeleteBank(self, *args):
+		"""
+		do the delete
+		"""
+		print("deleted!!")
+		self.dialogDeleteBank.dismiss()
+		database.deleteBankAcc(self.bankId)
+		toast("Your File Has been deleted.")
+		self.dialogDeleteBank.dismiss()
+
+	def editAccount(self, bankId):
+		"""
+		edit call method
+		"""
+		#Setting().dismissDialogB()
+		"""
+			Creates New dialogbox where bank elements
+			described in the textfield
+		"""
+		self.dialogEditBank = MDDialog(
+			title="Edit Bank info",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Edit_Bank_layout(bankId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditBank
+				),
+			]
+		)
+		self.dialogEditBank.open()
+
+	def closeEditBank(self, *args):
+		"""
+		close edit bank
+		"""
+		print("close edit")
+		self.dialogEditBank.dismiss()
+
+class Bank_list_layout(MDBoxLayout):
+	"""
+
+	This class is for listsing bank accounts from database table
+	"""
+	def __init__(self) -> None:
+		super(Bank_list_layout, self).__init__()
+		banks = database.readBankAcc()
+		self.bank_mdlist.clear_widgets()
+		for bank in banks:
+			self.bank_mdlist.add_widget(Bank_list_item(
+				bankId = bank[0],
+				bankName = bank[1],
+				bankAccountCreatedAt = bank[3],
+				bankAmount = str(bank[2]),
+				icon = "bank"
+			)
+			)
+
+class Edit_Bank_layout(MDBoxLayout):
+	"""
+	Edit bank info 
+		This is going to be called by mddialog in BankList item as content_cls
+	"""
+	ToDay = date.today()
+	def __init__(self, bankId) -> None:
+		super(Edit_Bank_layout, self).__init__(bankId)
+		self.bankId = bankId
+
+		"""
+		This is to change the text of the MDTextField when mddialog open
+		"""
+		bank = database.detailBankAccId(self.bankId)
+		print(bank)
+		self.bankEName.text = bank[1]
+		self.bankEAmount.text = str(bank[2])
+		self.bankECreatedAt.text = bank[3]
+
+	def saveChanges(self):
+		"""
+		to save(update) changes to database
+		"""
+		updatedAt = date.today()
+		database.updateBankAcc(self.bankId, self.bankEName.text, self.bankEAmount.text, self.bankECreatedAt.text, updatedAt)
+		toast("Data is updated successfully")
+
+class New_Bank_layout(MDBoxLayout):
+	"""
+	Adding New Bank Account
+	"""
+	ToDay = date.today()
+	def __init__(self) -> None:
+		super(New_Bank_layout, self).__init__()
+	def addNewBank(self):
+		"""
+		Save Fixed Expense
+		"""
+		if self.bankName.text and self.bankAmount.text and self.bankCreatedAt.text:
+			database.insertBankAcc(str(self.bankName.text), self.bankAmount.text, str(self.bankCreatedAt.text), str(self.bankCreatedAt.text))
+			toast("Data saved now you can close")
+		else:
+			toast("Fill all the information")	
+
+
 
 class New_Var_Expense_layout(MDBoxLayout):
 	"""
@@ -181,10 +328,18 @@ class New_sales_layout(MDBoxLayout):
 		"""
 		When Add button pressed in the new customer dialog
 		"""
-		if self.item_id.text and self.customer_id.text and self.item_quantitiy.text and self.sold_date.text and self.way_of_payment.text and self.sales_revenue.text:
+		if self.item_id.text and self.customer_id.text and self.item_quantitiy.text and self.sold_date.text and self.way_of_payment.text and self.bank_name.text and self.sales_revenue.text:
 			#print(self.customer_bank_account_number.text)
-			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.way_of_payment.text, self.sales_revenue.text)
-			toast('now you can close the popUp msg')
+			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.way_of_payment.text, self.sales_revenue.text, self.bank_name.text)
+			# to update customer frequencyOfPurchase and totalPurchase
+			customer = database.deatilCustomer(self.customer_id)
+			database.updateCustomer(self.customer_id, customer[1], customer[2], customer[3], customer[4], customer[5], customer[6], customer[7]+1, customer[8]+self.sales_revenue.text, customer[9])
+			# to update bankAcc amount and updateAt
+			bankAccount = database.detailBankAcc(self.bank_name.text)
+			updateDate = date.today()
+			updateDateStr = updateDate.strftime("%d/%m/%y")
+			database.updateBankAcc(bankAccount[0], bankAccount[1], bankAccount[2]+self.sales_revenue.text, bankAccount[3], updateDateStr)
+			toast('Sales added to database now you can close')
 		else:
 			toast('fill all info msg')
 
@@ -673,6 +828,61 @@ class Expneses(MDScreen):
 		self.dialogNewVarExpense.dismiss()
 		self.on_enter()
 
+class Setting(MDScreen):
+	"""
+	Settings page
+	"""
+	def bankList(self):
+		self.dialogBankList = MDDialog(
+			title="Bank list",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Bank_list_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeBankList
+				),
+				MDRaisedButton(
+					text="New",
+					theme_text_color="Custom",
+					on_press=self.newBank
+				),
+
+			]
+		)
+
+		self.dialogBankList.open()
+
+	def closeBankList(self, *args):
+		print("dismiss")
+		self.dialogBankList.dismiss(force=True)
+
+	def newBank(self, inst):
+		"""
+		New Bank MDDialog
+		"""
+		self.dialogBankList.dismiss()
+		self.dialogNewBank = MDDialog(
+			title="New Bank",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=New_Bank_layout(),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeNewBank
+				),
+			]
+		)
+		self.dialogNewBank.open()
+
+
+	def closeNewBank(self, inst):
+		self.dialogNewBank.dismiss()
+
 class DashBoard(MDScreen):
 	"""
 	This page is going to contain general-over
@@ -943,6 +1153,7 @@ class main(MDApp):
 		self.theme_cls.material_style ="M3"
 		screen_manager = ScreenManager()
 		screen_manager.add_widget(Builder.load_file("home.kv"))
+		screen_manager.add_widget(Builder.load_file("setings.kv"))
 		screen_manager.add_widget(Builder.load_file("expenses.kv"))
 		return screen_manager
 
@@ -952,6 +1163,14 @@ class main(MDApp):
 		"""
 		self.root.transition.direction = "right"
 		self.root.current = "home"
+
+	def gotoSetting(self):
+		"""
+		to goto settings
+		"""
+		print('settings')
+		self.root.transition.direction = "left"
+		self.root.current = "setting"
 
 if __name__ == "__main__":
 	main().run()

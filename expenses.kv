@@ -1,0 +1,262 @@
+#:kivy 2.1.0
+
+<New_Var_Expense_layout>
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+    varExpenseItem: varExpenseItem
+    varExpenseAmount: varExpenseAmount
+    varExpenseDate: varExpenseDate
+	ScrollView:
+		smooth_scroll_end: 10
+		MDList:
+			spacing: "5dp"
+            MDTextField:
+                id: varExpenseItem
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Item Name'
+            MDTextField:
+                id: varExpenseAmount
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Amount'
+            MDTextField:
+                id: varExpenseDate
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Date(dd/mm/yy)'
+            MDRaisedButton:
+                text: 'Save'
+                on_release: root.addNewVarExpense()
+
+<New_FExpense_layout>
+    id: new_fexpense
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+    fExpenseItem: fExpenseItem
+    fExpenseAmount: fExpenseAmount
+    fExpenseDate: fExpenseDate
+	ScrollView:
+		smooth_scroll_end: 10
+		MDList:
+			spacing: "5dp"
+            MDTextField:
+                id: fExpenseItem
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Item Name'
+            MDTextField:
+                id: fExpenseAmount
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Amount'
+            MDTextField:
+                id: fExpenseDate
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Date(dd/mm/yy)'
+            MDRaisedButton:
+                text: 'Save'
+                on_release: root.addNewFExpense()
+
+<MDXpense>
+    focus_behavior: True
+    size_hint: None, None
+    size: '295dp', '50dp'
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    ripple_behavior: True
+    MDBoxLayout:
+        orientation: "horizontal"
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        padding: 10
+        spacing: "5sp"
+        MDTextButton:
+            id: expenseName
+            size_hint_x: .33
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.expenseName
+        MDTextButton:
+            id: expenseAmount
+            size_hint_x: .33
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.expenseAmount
+        MDTextButton:
+            id: expenseDate
+            size_hint_x: .33
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.expenseDate
+
+
+Expneses:
+    name: "expense"
+    fixedExpenses: fixedExpenses
+    variableExpenses: variableExpenses
+    monthDropDownMenuCaller: monthDropDownMenuCaller
+    MDScreen:
+        MDBoxLayout:
+            orientation: 'vertical'
+            spacing: 1
+            MDTopAppBar:
+                widget_position: 'top'
+                title: "Expenses"
+                left_action_items: [["arrow-left", lambda x:app.backHome(), "Back"]]
+                right_action_items: [["tune-variant"]]
+                specific_text_color: app.theme_cls.opposite_bg_normal
+                md_bg_color: app.theme_cls.bg_normal
+                elevation: 1
+            ScrollView:
+                do_scroll_x: False
+                smooth_scroll_end: 10
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: 7
+                    MDCard:
+                        focus_behavior: True
+                        size_hint: None, None
+                        size: '310dp', '30dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        elevation: 1
+
+                        OneLineAvatarIconListItem:
+                            id: monthDropDownMenuCaller
+                            markup: True
+                            text: 'October'
+                            radius: [15,15,15,15]
+                            valign: 'center'
+                            pos_hint: {'center_y': .5}
+                            divider: None
+                            #divider_color: app.theme_cls.primary_dark
+                            #size_hint_y: .18
+                            IconRightWidget:
+                                icon: "chevron-down"
+                                icon_size: "30sp"
+                                theme_icon_color: "Custom"
+                                icon_color: app.theme_cls.primary_dark
+                                on_release: root.main_monthMenu.open()
+
+                    MDCard:
+                        focus_behavior: True
+                        size_hint: None, None
+                        size: '310dp', '240dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5}
+                        elevation: 3
+                        #ripple_behavior: True
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            OneLineAvatarIconListItem:
+                                markup: True
+                                text: '[b]Fixed[/b]'
+                                radius: [15,15,0,0]
+                                valign: 'center'
+                                pos_hint: {'center_y': .5}
+                                divider_color: app.theme_cls.primary_dark
+                                #size_hint_y: .18
+                                IconRightWidget:
+                                    icon: "plus"
+                                    icon_size: "30sp"
+                                    theme_icon_color: "Custom"
+                                    icon_color: app.theme_cls.primary_dark
+                                    on_release: root.addFixedE()
+                            MDBoxLayout:
+                                orientation: "horizontal"
+                                size_hint_y: .2
+                                pos_hint: {'center_x': .5}
+                                spacing: 10
+                                radius: [0,0,15,15]
+                                padding: 10
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Item'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Amount'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Date'
+                            ScrollView:
+                                do_scroll_x: False
+                                smooth_scroll_end: 10
+                                size_hint_y: .8
+                                MDBoxLayout:
+                                    id: fixedExpenses
+                                    adaptive_size: True
+                                    padding: "10sp"
+                                    spacing: "7sp"
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    orientation: 'vertical'
+                                    # here is where the expenses add up by card
+
+                    MDCard:
+                        focus_behavior: True
+                        size_hint: None, None
+                        size: '310dp', '240dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5}
+                        elevation: 3
+                        #ripple_behavior: True
+                        MDBoxLayout:
+                            orientation: "vertical"
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            OneLineAvatarIconListItem:
+                                markup: True
+                                text: '[b]Variable[/b]'
+                                radius: [15,15,0,0]
+                                valign: 'center'
+                                pos_hint: {'center_y': .5}
+                                divider_color: app.theme_cls.primary_dark
+                                #size_hint_y: .18
+                                IconRightWidget:
+                                    icon: "plus"
+                                    icon_size: "30sp"
+                                    theme_icon_color: "Custom"
+                                    icon_color: app.theme_cls.primary_dark
+                                    on_release: root.addVarE()
+                            MDBoxLayout:
+                                orientation: "horizontal"
+                                size_hint_y: .2
+                                pos_hint: {'center_x': .5}
+                                spacing: 10
+                                radius: [0,0,15,15]
+                                padding: 10
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Item'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Amount'
+                                MDRoundFlatButton:
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    size_hint_x: .33
+                                    text: 'Date'
+                            ScrollView:
+                                do_scroll_x: False
+                                smooth_scroll_end: 10
+                                size_hint_y: .8
+                                MDBoxLayout:
+                                    id: variableExpenses
+                                    adaptive_size: True
+                                    padding: "10sp"
+                                    spacing: "7sp"
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    orientation: 'vertical'
+                                    # here is where the expenses add up by card

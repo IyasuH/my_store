@@ -1,0 +1,266 @@
+#:kivy 2.1.0
+
+<New_Bank_layout>
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+    bankName: bankName
+    bankAmount: bankAmount
+    bankCreatedAt: bankCreatedAt
+	height: "400dp"
+	ScrollView:
+        do_scroll_x: False
+		smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                spacing: "6dp"
+                MDTextField:
+                    id: bankName
+                    multiline: False
+                    mode: "rectangle"
+                    hint_text: 'Bank Name'
+                MDTextField:
+                    id: bankAmount
+                    multiline: False
+                    mode: "rectangle"
+                    hint_text: 'Current Amount'
+                MDTextField:
+                    id: bankCreatedAt
+                    multiline: False
+                    mode: "rectangle"
+                    hint_text: 'Created At'
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, root.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+            MDRaisedButton:
+                text: 'Save'
+                on_release: root.addNewBank()
+
+<Bank_list_item>
+    size_hint_y: None
+    height: content.height
+    MDCardSwipeLayerBox:
+        padding: "8dp"
+        md_bg_color: (243/255, 63/255, 63/255, 1)
+        MDIconButton:
+            icon: "trash-can"
+            pos_hint: {"center_y": .5}
+            on_release: root.deleteAccount(root.bankId)
+    MDCardSwipeFrontBox:
+        radius: [0,0,0,0]
+        ThreeLineAvatarIconListItem:
+            id: content
+            text: root.bankName
+            secondary_text: root.bankAccountCreatedAt
+            tertiary_text: root.bankAmount
+            bankId: root.bankId
+            divider: None
+            _no_ripple_effect: True
+            IconLeftWidget:
+                icon: root.icon
+                disabled: True
+                icon_size: "30sp"
+            IconRightWidget:
+                icon: "pencil-outline"
+                con_size: "20sp"
+                # this is to edit account()
+                on_release: root.editAccount(root.bankId)
+
+<Edit_Bank_layout>
+    id: new_fexpense
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    bank_mdEdit: bank_mdEdit
+    bankEName: bankEName
+    bankEAmount: bankEAmount
+    bankECreatedAt: bankECreatedAt
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                id: bank_mdEdit
+                spacing: "7dp"
+                MDTextField:
+                    id: bankEName
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Bank Name'
+                    text: ""
+                MDTextField:
+                    id: bankEAmount
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Current Amount'
+                    text: ""
+                MDTextField:
+                    id: bankECreatedAt
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Created At'
+                    text: ""
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, root.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
+
+<Bank_list_layout>
+    id: new_fexpense
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    bank_mdlist: bank_mdlist
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "7dp"
+            padding: "7dp"
+            id: bank_mdlist
+        #MDBoxLayout:
+            #id: bank_mdlist
+            #orientation: 'vertical'
+            #adaptive_size: True
+            #padding: "10sp"
+            #spacing: "7sp"
+            #pos_hint: {'center_x': .5, 'center_y': .5}
+            #MDList:
+                #id: bank_mdlist
+
+
+Setting:
+    name: "setting"
+    MDScreen:
+        MDBoxLayout:
+            orientation: 'vertical'
+            sapcing: 1
+            MDTopAppBar:
+                widget_position: 'top'
+                title: "Settings"
+                left_action_items: [["arrow-left", lambda x:app.backHome(), "Back"]]
+                #right_action_items: [["tune-variant"]]
+                specific_text_color: app.theme_cls.opposite_bg_normal
+                md_bg_color: app.theme_cls.bg_normal
+                elevation: 1
+            ScrollView:
+                do_scroll_x: False
+                smooth_scroll_end: 10
+                MDList:
+                    padding: 7, 0, 7, 0
+                    spacing: 10
+                    MDList:
+                        spacing: 1
+                        md_bg_color: app.theme_cls.bg_darkest
+                        radius: 14, 14, 14, 14
+
+                        OneLineListItem:
+                            text: "Account"
+                            _txt_left_pad: "20dp"
+                            size_hint_y: None
+                            radius: 13, 13, 0, 0
+                            height: "33dp"
+                            _txt_bot_pad: "6dp"
+                            disabled: True
+                            divider: 'Inset'
+                            divider_color: app.theme_cls.opposite_bg_dark
+                            bg_color: app.theme_cls.bg_darkest
+
+                        TwoLineAvatarIconListItem:
+                            id: accNameEmailNumber
+                            text: "Bety"
+                            bg_color: app.theme_cls.bg_darkest
+                            secondary_text: "Personal info"
+                            _txt_left_pad: "90dp"
+                            radius: 0, 0, 13, 13
+                            padding: 2, 0, 2, 0
+                            divider: None
+                            IconLeftWidget:
+                                icon: "account-circle"
+                                icon_size: "50sp"
+                            IconRightWidget:
+                                icon: "pencil-outline"
+                                icon_size: "20sp"
+                                #on_release: app.edit_account_user()
+
+                    MDList:
+                        spacing: 1
+                        md_bg_color: app.theme_cls.bg_darkest
+                        radius: 14, 14, 14, 14
+                        OneLineListItem:
+                            text: "Bank Account"
+                            _txt_left_pad: "20dp"
+                            size_hint_y: None
+                            radius: 13, 13, 0, 0
+                            height: "33dp"
+                            _txt_bot_pad: "6dp"
+                            disabled: True
+                            divider: 'Inset'
+                            divider_color: app.theme_cls.opposite_bg_dark
+                            bg_color: app.theme_cls.bg_darkest
+                        OneLineAvatarIconListItem:
+                            radius: 0, 0, 13, 13
+                            text: "Manage bank account"
+                            on_release: root.bankList()
+                            bg_color: app.theme_cls.bg_darkest
+                            divider: None
+                            IconLeftWidgetWithoutTouch:
+                                icon: 'bank'
+                            IconRightWidgetWithoutTouch:
+                                icon: 'chevron-right'
+                                on_release: 
+                    MDList:
+                        spacing: 1
+                        md_bg_color: app.theme_cls.bg_darkest
+                        radius: 14, 14, 14, 14
+                        OneLineAvatarIconListItem:
+                            radius: 0, 0, 13, 13
+                            text: "Notification"
+                            #on_release: root.withdraw_money()
+                            bg_color: app.theme_cls.bg_darkest
+                            divider: None
+                            IconLeftWidgetWithoutTouch:
+                                icon: 'bell-cog'
+                            IconRightWidgetWithoutTouch:
+                                icon: 'chevron-right'
+                    MDList:
+                        spacing: 1
+                        md_bg_color: app.theme_cls.bg_darkest
+                        radius: 14, 14, 14, 14
+                        OneLineAvatarIconListItem:
+                            radius: 0, 0, 13, 13
+                            text: "Dark Mode"
+                            #on_release: root.withdraw_money()
+                            bg_color: app.theme_cls.bg_darkest
+                            divider: None
+                            IconLeftWidgetWithoutTouch:
+                                icon: 'weather-night'
+                            MDSwitch:
+                                pos_hint: {'center_x': .85, 'center_y': .5}
+                    MDList:
+                        spacing: 1
+                        md_bg_color: app.theme_cls.bg_darkest
+                        radius: 14, 14, 14, 14
+                        OneLineAvatarIconListItem:
+                            radius: 0, 0, 13, 13
+                            text: "Help"
+                            #on_release: root.withdraw_money()
+                            bg_color: app.theme_cls.bg_darkest
+                            divider: None
+                            IconLeftWidgetWithoutTouch:
+                                icon: 'lifebuoy'
+                            IconRightWidgetWithoutTouch:
+                                icon: 'chevron-right'

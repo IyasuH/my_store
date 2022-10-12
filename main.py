@@ -18,7 +18,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.filemanager import MDFileManager
-from kivymd.uix.list import TwoLineAvatarListItem, ThreeLineAvatarIconListItem
+from kivymd.uix.list import TwoLineAvatarListItem, ThreeLineAvatarIconListItem, OneLineListItem, TwoLineListItem
 from kivymd.uix.dialog import MDDialog
 from kivymd.toast import toast
 from kivy.metrics import dp
@@ -26,18 +26,21 @@ from kivy.core.window import Window
 import os
 import database
 import openpyxl
-from kivy.properties import ListProperty, NumericProperty, StringProperty
+from kivy.properties import ListProperty, NumericProperty, StringProperty, ObjectProperty
 from kivymd.uix.behaviors import RoundedRectangularElevationBehavior
 from kivymd.uix.card import MDCard, MDCardSwipe
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.clock import Clock
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.textfield.textfield import MDTextField
+#from kivy.config import Config
+
 
 class MDashCard(MDCard):
 	"""
 	cards on the dashboard
 	"""
+	winSize = Window.size
 	focu_color = ListProperty([1, 1, 1])
 	unfocu_color = ListProperty([1, 1, 1])
 	text1 = StringProperty("")
@@ -70,22 +73,187 @@ class MDSalesCard(MDCard):
 		amount - amount gained (qty*single value)value
 		date - when sales made	
 	"""
+	salesId = NumericProperty(0)
 	salesName = StringProperty("")
 	salesQty = StringProperty("")
 	salesAmount = StringProperty("")
 	salesDate = StringProperty("")
+	def sales_detail(self, salesId):
+		"""
+		sales detail
+		"""
+		self.sales_detailPopup = MDDialog(
+			title="Sales detail",
+			type="custom",
+			content_cls=Detail_sales_layout(salesId),
+			buttons=[
+				MDRaisedButton(
+					text="Edit",
+					on_press=self.editSales,
+					id = str(salesId),
+				),
+				MDRaisedButton(
+					text="Delete",
+					on_press=self.deleteSales,
+					id = str(salesId),
+				)
+			]
+		)
+		self.sales_detailPopup.open()
+
+	def editSales(self, inst):
+		"""
+		Edit specific sales
+		"""
+		salesId=inst.id
+		self.dialogEditSales = MDDialog(
+			title="Edit Sales",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Edit_Sales_layout(salesId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditSales
+				),
+			]
+		)
+		self.dialogEditSales.open()
+		self.sales_detailPopup.dismiss()
+
+	def closeEditSales(self, inst):
+		"""
+		close edit sales
+		"""
+		print("close edit")
+		self.dialogEditSales.dismiss()
+		#self.on_enter()
+
+	def deleteSales(self, inst):
+		"""
+		delete specific sales
+		"""
+		salesId=inst.id
+		self.dialogDeleteSales = MDDialog(
+			title="Are You Sure?",
+			text="You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteSales
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteSales,
+					id=str(salesId)
+				)
+			]
+		)
+		self.dialogDeleteSales.open()
+		self.sales_detailPopup.dismiss()
+	def cancleDeleteSales(self, inst):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteSales.dismiss()
+
+	def sureDeleteSales(self, inst):
+		"""
+		do the delete
+		"""
+		#####DON'T FORGET THIS####
+		#### HERE REQUIRED TO EDIT OTHER TABLES INCLUDING bankAcc(amount), customer(totalsale), item(quantity)####
+
+		self.dialogDeleteSales.dismiss()
+		database.deleteSales(inst.id)
+		toast("Your File Has been deleted.")
+		self.dialogDeleteSales.dismiss()
+		#self.on_enter()
+
 
 
 class MDCustomCard(MDCard):
 	"""
 	Crads for Customers page
 	"""
+	customerId = NumericProperty(0)
 	customerName = StringProperty("")
 	companyName = StringProperty("")
 	customerTinNumber = StringProperty("")
 	customerPhoneNumber = StringProperty("")
 	totalPurchased = StringProperty(0)
 	itemPurchased = ListProperty([])
+	def editCustomer(self):
+		"""
+		edit customer
+		"""
+		print("on editCustomer")
+		self.dialogEditCustomer = MDDialog(
+			title="Edit Customer info",
+			type="custom",
+			content_cls=Edit_Customer_layout(self.customerId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditCustomer
+				)
+			]
+		)
+		self.dialogEditCustomer.open()
+
+	def closeEditCustomer(self, inst):
+		"""
+		close edit bank
+		"""
+		print(Edit_Customer_layout(self.customerId).customerName.text)
+		self.dialogEditCustomer.dismiss()
+
+	def deleteCustomer(self):
+		"""
+		delete call method
+		"""
+		print("on deleteCustomer")
+		self.dialogDeleteCustomer = MDDialog(
+			title="Are You Sure?",
+			text="You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteCustomer
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteCustomer,
+				)
+			]
+		)
+		self.dialogDeleteCustomer.open()
+	def cancleDeleteCustomer(self, *args):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteCustomer.dismiss()
+
+	def sureDeleteCustomer(self, inst):
+		"""
+		do the delete
+		"""
+		self.dialogDeleteCustomer.dismiss()
+		database.deleteCustomer(self.customerId)
+		print("delete id", self.customerId)
+		toast("Your File Has been deleted.")
 
 class CircularProgressBar(AnchorLayout):
 	"""
@@ -246,6 +414,86 @@ class Edit_Bank_layout(MDBoxLayout):
 		database.updateBankAcc(self.bankId, self.bankEName.text, self.bankEAmount.text, self.bankECreatedAt.text, updatedAt)
 		toast("Data is updated successfully")
 
+class Edit_Sales_layout(MDBoxLayout):
+	"""
+	Edit Sales
+	"""
+	def __init__(self, salesId):
+		super(Edit_Sales_layout, self).__init__(salesId)
+		self.salesId = salesId
+
+		sales = database.detailSales(self.salesId)
+		self.itemId.text = str(sales[1])
+		self.customerId.text = str(sales[2])
+		self.bankId.text = str(sales[6])
+		self.itemQuantity.text = str(sales[3])
+		self.soldAt.text = str(sales[4])
+		self.salesRevenu.text = str(sales[5])
+		
+	def saveChanges(self):
+		"""
+		to save(update) changes to database
+		"""
+		#####DON'T FORGET THIS####
+		#### HERE REQUIRED TO EDIT OTHER TABLES INCLUDING bankAcc(amount), customer(totalsale), item(quantity)####
+		updatedAt = date.today()
+		database.updateSales(self.salesId, self.itemId.text, self.customerId.text, self.itemQuantity.text, self.soldAt.text, self.salesRevenu.text, self.bankId.text)
+		toast("Data is updated now you can close")
+
+class Edit_Customer_layout(MDBoxLayout):
+	"""
+	Edit Customer
+	"""
+	def __init__(self, customerId):
+		super(Edit_Customer_layout, self).__init__(customerId)
+		self.customerId = customerId
+
+		customer = database.detailCustomer(self.customerId)
+		self.customerName.text = customer[1]
+		self.companyName.text = customer[2]
+		self.tinNumber.text = str(customer[3])
+		self.customerCity.text = customer[4]
+		self.customerPhoneN.text = str(customer[5])
+		self.accountCreatedAt.text = customer[6]
+		self.frequencyOfP.text = str(customer[7])
+		self.totalP.text = str(customer[8])
+		self.accountNumber.text = str(customer[9])
+
+	def saveChanges(self):
+		"""
+		to save(update) changes to database
+		"""
+		updatedAt = date.today()
+		database.updateCustomer(self.customerId, self.customerName.text, self.companyName.text, self.tinNumber.text, self.customerCity.text, self.customerPhoneN.text, self.accountCreatedAt.text, self.frequencyOfP.text, self.totalP.text, self.accountNumber.text)
+		toast("Data is updated now you can close")
+
+class Edit_Item_layout(MDBoxLayout):
+	"""
+	Edit Inventory Item
+	"""
+	def __init__(self, itemId):
+		super(Edit_Item_layout, self).__init__(itemId)
+		self.itemId = itemId
+
+		"""
+		This is to change the text of the MDTextField when mddialog open
+		"""
+		item = database.detailItem(self.itemId)
+		self.itemName.text = item[1]
+		self.itemQuantity.text = str(item[2])
+		self.purchasedAt.text = item[3]
+		self.sellingPS.text = str(item[4])
+		self.sellingPB.text = str(item[5])
+
+	def saveChanges(self):
+		"""
+		to save(update) changes to database
+		"""
+		updatedAt = date.today()
+		database.updateItem(self.itemId, self.itemName.text, self.itemQuantity.text, self.purchasedAt.text, self.sellingPS.text, self.sellingPB.text, updatedAt)
+		toast("Data is updated now you can close")
+
+
 class New_Bank_layout(MDBoxLayout):
 	"""
 	Adding New Bank Account
@@ -324,21 +572,131 @@ class New_sales_layout(MDBoxLayout):
 	"""
 	def __init__(self) -> None:
 		super(New_sales_layout, self).__init__()
+		"""
+		this is drop down that appers when text field for items touched
+		in new sales
+		"""
+		item_list = database.readSItem()
+		item_menu = [
+			{
+				"viewclass": "OneLineListItem",
+				"height": dp(35),
+				"text": i[1],
+				"max_height": dp(224),
+				"on_release": lambda y=i[0]:self.setItem(y),
+			}for i in item_list]
+		self.listItem = MDDropdownMenu(
+			caller = self.item_id,
+			items=item_menu,
+			position = "bottom",
+			width_mult=4,
+		)
+		"""
+		this is drop down that appers when text field for customers touched
+		in new sales
+		"""
+		customer_list = database.readSCustomer()
+		customer_menu = [
+			{
+				"viewclass": "OneLineListItem",
+				"height": dp(35),
+				"max_height": dp(224),				
+				"text": c[1],
+				"on_release": lambda y=c[0]:self.setCustomer(y),
+			}for c in customer_list]
+		self.listCustomer = MDDropdownMenu(
+			caller = self.customer_id,
+			items=customer_menu,
+			position = "bottom",
+			width_mult=4,
+		)
+		"""
+		this is drop down that appers when text field for BankAccount touched
+		in new sales
+		"""
+		bank_list = database.readBankAcc()
+		bank_menu = [
+			{
+				"viewclass": "OneLineListItem",
+				"height": dp(35),
+				"max_height": dp(224),
+				"text": b[1],
+				"on_release": lambda y=b[0]:self.setBank(y),
+			}for b in bank_list]
+		self.listBank = MDDropdownMenu(
+			caller = self.bank_id,
+			items=bank_menu,
+			position = "bottom",
+			width_mult=4,
+		)
+		
+	def setItem(self, itemId):
+		"""
+		When item selected from dropdown menu
+		"""
+		self.item_id.text = str(itemId)
+		self.listItem.dismiss()
+	def setCustomer(self, customerId):
+		"""
+		When customer selected from dropdown menu
+		"""
+		self.customer_id.text = str(customerId)
+		self.listCustomer.dismiss()
+	def setBank(self, bankId):	
+		"""
+		When bank selected from dropdown menu
+		"""
+		self.bank_id.text = str(bankId)
+		self.listBank.dismiss()
+	
+	def calSalesReve(self):
+		"""
+		calculate sales revenue
+		"""
+		if self.item_quantitiy.text and self.item_id.text:
+			revenu = int(self.item_quantitiy.text) * int(database.detailItem(self.item_id.text)[4])
+			self.sales_revenue.text = str(revenu)
+			self.sales_revenue.hint_text = "in cherecahro"
+		else:
+			pass
 	def addNewSales(self):
 		"""
 		When Add button pressed in the new customer dialog
 		"""
-		if self.item_id.text and self.customer_id.text and self.item_quantitiy.text and self.sold_date.text and self.way_of_payment.text and self.bank_name.text and self.sales_revenue.text:
-			#print(self.customer_bank_account_number.text)
-			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.way_of_payment.text, self.sales_revenue.text, self.bank_name.text)
+		if self.item_id.text and self.customer_id.text and self.item_quantitiy.text and self.sold_date.text and self.bank_id.text and self.sales_revenue.text:
 			# to update customer frequencyOfPurchase and totalPurchase
-			customer = database.deatilCustomer(self.customer_id)
-			database.updateCustomer(self.customer_id, customer[1], customer[2], customer[3], customer[4], customer[5], customer[6], customer[7]+1, customer[8]+self.sales_revenue.text, customer[9])
+			customer = database.detailCustomer(self.customer_id.text)
+			if customer:
+				database.updateCustomer(int(self.customer_id.text), customer[1], customer[2], customer[3], customer[4], customer[5], customer[6], customer[7]+1, customer[8]+int(self.sales_revenue.text), customer[9])
+			else:
+				toast("wrong customer id")
+				return
 			# to update bankAcc amount and updateAt
-			bankAccount = database.detailBankAcc(self.bank_name.text)
-			updateDate = date.today()
-			updateDateStr = updateDate.strftime("%d/%m/%y")
-			database.updateBankAcc(bankAccount[0], bankAccount[1], bankAccount[2]+self.sales_revenue.text, bankAccount[3], updateDateStr)
+			bankAccount = database.detailBankAccId(self.bank_id.text)
+			if bankAccount:
+				updateDate = date.today()
+				updateDateStr = updateDate.strftime("%d/%m/%y")
+				database.updateBankAcc(bankAccount[0], bankAccount[1], bankAccount[2]+int(self.sales_revenue.text), bankAccount[3], updateDateStr)
+			else:
+				toast("wrong bankId id")
+				return
+			item = database.detailItem(self.item_id.text)
+			if item:
+				"""
+				Here check for item quantity
+				"""
+				if item[2] < int(self.item_quantitiy.text):
+					# no insufficient
+					toast("selected item is insufficient check Your Inventory!")
+					return
+				else:
+					pass
+			else:
+				toast("Wrong item Id")
+				return
+			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.sales_revenue.text, self.bank_id.text)
+			updateAt = date.today()
+			database.updateItem(item[0], item[1], item[2] - int(self.item_quantitiy.text), item[3], item[4], item[5], updateAt)
 			toast('Sales added to database now you can close')
 		else:
 			toast('fill all info msg')
@@ -356,9 +714,9 @@ class New_stock_layout(MDBoxLayout):
 		when new item is added
 		"""
 		print("new stoklayout")
-		print(self.item_name.text, self.item_quantity.text, self.purchased_price.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
-		if self.item_name.text and self.item_quantity.text and self.purchased_price.text and self.purchased_date.text and self.selling_price_single.text and self.selling_price_bulk.text:
-			database.insertItem(self.item_name.text, self.item_quantity.text, self.purchased_price.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
+		print(self.item_name.text, self.item_quantity.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
+		if self.item_name.text and self.item_quantity.text and self.purchased_date.text and self.selling_price_single.text and self.selling_price_bulk.text:
+			database.insertItem(self.item_name.text, self.item_quantity.text, self.purchased_date.text, self.selling_price_single.text, self.selling_price_bulk.text)
 			toast('Data saved successfully now you can close')
 		else:
 			toast('Complete filling the info')
@@ -366,18 +724,34 @@ class New_stock_layout(MDBoxLayout):
 class customerItem(TwoLineAvatarListItem):
 	pass
 
+class Detail_sales_layout(MDBoxLayout):
+	"""
+	sales detail
+	"""
+	def __init__(self, salesId) -> None:
+		super(Detail_sales_layout, self).__init__(salesId)
+		#print(Id)
+		sales = database.detailSales(salesId)
+		self.itemId.secondary_text = str(sales[1])
+		self.customerId.secondary_text = str(sales[2])
+		self.bankId.secondary_text = str(sales[6])
+		self.itemQuantity.secondary_text = str(sales[3])
+		self.soldAt.secondary_text = str(sales[4])
+		self.salesRevenu.secondary_text = str(sales[5])
+
+
 class Detail_item_layout(MDBoxLayout):
 	def __init__(self, Id) -> None:
 		super(Detail_item_layout, self).__init__()
-		print(Id)
+		#print(Id)
+		self.itemId = Id
 		self.stock = database.detailItem(Id)
 		self.item_name.secondary_text = str(self.stock[1])
 		self.item_quantity.secondary_text = str(self.stock[2])
-		self.purchased_price.secondary_text = str(self.stock[3])
-		self.purchased_date.secondary_text = str(self.stock[4])
-		self.single_selling_price.secondary_text = str(self.stock[5])
-		self.bulk_selling_price.secondary_text = str(self.stock[6])
-		self.updated_at.secondary_text = str(self.stock[7])
+		self.purchased_date.secondary_text = str(self.stock[3])
+		self.single_selling_price.secondary_text = str(self.stock[4])
+		self.bulk_selling_price.secondary_text = str(self.stock[5])
+		self.updated_at.secondary_text = str(self.stock[6])
 
 class Home(MDScreen):
 	"""
@@ -394,39 +768,37 @@ class Home(MDScreen):
 			exit_manager=self.exit_manager,
 			select_path=self.select_item_path,
 		)
+		# intialized with current month
+		DATE = datetime.now()
+		self.monthForSales = DATE.strftime("%m")
+		self.monthShort = DATE.strftime("%b")
 	def on_enter(self):
 		self.itemList = database.readSItem()
 		for x in self.itemList:
 			if x[2] <= 0:
-				availability = ("alert-circle", [1, 0, 0, 1], "No item")			
+				ava = ("alert-circle", [1, 0, 0, 1], x[1])
 			elif x[2] < 10:
-				availability = ("alert", [255/256, 165/256, 0, 1], "less than 10")
+				ava = ("alert", [255/256, 165/256, 0, 1], x[1])
 			else:
-				availability = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "Available")
-			x.insert(2, availability)
-
+				ava = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], x[1])
+			x.append(float(x[2])*float(x[3]))
+			x[1] = ava
 		####THIS IS FOR THE STOCK TAB TO LOAD THE MDDataTable AND Buttons####
 
 		self.stock_tables = MDDataTable(
-			pos_hint={'center_x': 0.5},
-			size_hint=(1, 1),
+			pos_hint={'center_x': 0.5, 'center_y': .5},
 			rows_num=100,
-			#use_pagination=False,
-			#background_color_header=main().theme_cls.bg_darkest,
-			#background_color_cell=main().theme_cls.bg_dark,
-			#background_color=main().theme_cls.bg_darkest,
 			elevation=3,
-			#rows_num=50,
+			padding=0,
 			column_data=[
 				("ID", dp(7)),
-				("Name", dp(14)),
-				("Availability", dp(22)),
-				("Qty", dp(10)),
-				("P_Price", dp(13)),
-				("S-Price", dp(13)),
-				("B-Price", dp(13))],
+				("Name", dp(20)),
+				("Qty", dp(8)),
+				("Price", dp(11)),
+				("Total", dp(11))],
 			row_data=self.itemList,)
 		self.stock_tables.bind(on_row_press=self.item_row_selected)
+
 		newStockFile = MDIconButton(
 			icon="attachment",
 			pos_hint={'x': .8, 'y': .05},
@@ -437,23 +809,17 @@ class Home(MDScreen):
 			#rounded_button = True,
 			on_release=self.uploadStockFromFile
 		)				
-		newStock = MDRaisedButton(
-			text="New",
-			icon="plus",
-			pos_hint={'x':.02, 'y': .03},
-			on_release=self.newStock
-			)
 		self.tock_tab.add_widget(self.stock_tables)
-		self.tock_tab.add_widget(newStock)
 		self.tock_tab.add_widget(newStockFile)
 
 		#####################################################
-		####THIS FOR STOCK TAB TO LOAD THE CUSTOMER CARDS####
+		####THIS FOR CUSTOMER TAB TO LOAD THE CUSTOMER CARDS####
 
 		self.customerTab.clear_widgets()
 		customersList = database.readSCustomer()
 		for x in customersList:
 			self.customerTab.add_widget(MDCustomCard(
+				customerId=x[0],
 				customerName = x[1],
 				companyName = x[2],
 				customerTinNumber = str(x[5]),
@@ -466,9 +832,32 @@ class Home(MDScreen):
 		####################################################
 		#####THIS FOR SALES TAB TO LOAD THE CUSTOM TABLE####
 
+		#~~~~MONTH FILTER FOR SALES~~~~~#
+		self.monthDropDownMenuCaller.text = str(self.monthShort)
+		months=[("Jan", 1), ("Feb", 2), ("Mar", 3), ("Apr", 4), ("May", 5), ("Jun", 6), ("Jul", 7), ("Aug", 8), ("Sep", 9), ("Oct", 10), ("Nov", 11), ("Dec", 12)]
+		monthMenu_items = [
+			{
+				"viewclass": "OneLineListItem",
+				"text": f"{i[0]}",
+				"height": dp(33),
+				"on_release": lambda x=i: self.changeMonthSales(x)
+			}for i in months
+		]
+		self.main_monthMenu = MDDropdownMenu(
+			items=monthMenu_items,
+			caller=self.monthDropDownMenuCaller,
+			width_mult=1.5,
+		)
+
 		self.salesTab.clear_widgets()
 		# here to made filter based on month
 		allSales = database.readSomeSales()
+		monthSales = []
+		for x in allSales:
+			if x[3][3:5] == str(self.monthForSales):
+				monthSales.append(x)
+		# convert (allSales) to (monthSales)
+		allSales = monthSales
 		itemName=[]
 		# here what i do is to convert itemId to itemName
 		
@@ -481,11 +870,29 @@ class Home(MDScreen):
 
 		for x in allSales:
 			self.salesTab.add_widget(MDSalesCard(
+				salesId = str(x[4]),
 				salesName = str(x[0]),
 				salesQty = str(x[1]),
 				salesAmount = str(x[2]),
 				salesDate = str(x[3])
 			))
+
+	def changeMonthSales(self, selMonth):
+		"""
+		When month selected
+		"""
+		print(selMonth)
+		#self.monthDropDownMenuCaller.text=selMonth[0]
+		self.monthForSales = selMonth[1]
+		self.monthShort = selMonth[0]
+		self.on_enter()
+
+	def reFresh(self):
+		"""
+		to refesh changes on the database to screen
+		"""
+		self.on_enter()
+
 
 	def newSales(self):
 		"""
@@ -505,6 +912,7 @@ class Home(MDScreen):
 			]
 		)
 		self.dialogNewSales.open()
+
 	def closeNewSales(self, inst):
 		"""
 		close button in add new sales dialog
@@ -555,59 +963,6 @@ class Home(MDScreen):
 		'''
 		self.manager_open = False
 		self.item_manager.close()			
-	def stockFunc(self):
-		"""
-		This function is to return the items table
-		"""
-		self.itemList = database.readSItem()
-		for x in self.itemList:
-			if x[2] <= 0:
-				availability = ("alert-circle", [1, 0, 0, 1], "No item")			
-			elif x[2] < 10:
-				availability = ("alert", [255/256, 165/256, 0, 1], "less than 10")
-			else:
-				availability = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "Available")
-			x.insert(2, availability)
-
-		self.stock_tables = MDDataTable(
-			pos_hint={'center_x': 0.5},
-			size_hint=(1, 1),
-			rows_num=100,
-			#use_pagination=False,
-			#background_color_header=main().theme_cls.bg_darkest,
-			#background_color_cell=main().theme_cls.bg_dark,
-			#background_color=main().theme_cls.bg_darkest,
-			elevation=3,
-			#rows_num=50,
-			column_data=[
-				("ID", dp(7)),
-				("Name", dp(14)),
-				("Availability", dp(22)),
-				("Qty", dp(10)),
-				("P_Price", dp(13)),
-				("S-Price", dp(13)),
-				("B-Price", dp(13))],
-			row_data=self.itemList,)
-		self.stock_tables.bind(on_row_press=self.item_row_selected)
-		newStockFile = MDIconButton(
-			icon="attachment",
-			pos_hint={'x': .8, 'y': .05},
-			theme_icon_color="Custom",
-			icon_color='white',
-			md_bg_color='blue',
-			#set_radius=[50,50,50,50],
-			#rounded_button = True,
-			on_release=self.uploadStockFromFile
-		)				
-		newStock = MDRaisedButton(
-			text="New",
-			icon="plus",
-			pos_hint={'x':.02, 'y': .03},
-			on_release=self.newStock
-			)
-		self.tock_tab.add_widget(self.stock_tables)
-		self.tock_tab.add_widget(newStock)
-		self.tock_tab.add_widget(newStockFile)
 
 	def item_row_selected(self, table, row):
 		"""
@@ -630,16 +985,93 @@ class Home(MDScreen):
 				MDRaisedButton(
 					text="Edit",
 					on_press=self.editStock,
+					# here I put the item id as id
+					# to get item id since passing value is raising cannot call Error
+					# same for delete
+					id = Id,
 				),
 				MDRaisedButton(
-					text="Delete"
+					text="Delete",
+					on_press=self.deleteStock,
+					id = Id,
 				)
 			]
 		)
 		self.item_detailPopup.open()
 
-	def editStock(self, *args):
-		print('Error: ', args[0])
+	def editStock(self, inst):
+		"""
+		Edit specific stock item
+		"""
+		itemId=inst.id
+		print("inst in ediStock", inst.id)
+		self.dialogEditItem = MDDialog(
+			title="Edit Inventory Item",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Edit_Item_layout(itemId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditItem
+				),
+			]
+		)
+		self.dialogEditItem.open()
+		self.item_detailPopup.dismiss()
+
+	def closeEditItem(self, inst):
+		"""
+		close edit bank
+		"""
+		print("close edit")
+		self.dialogEditItem.dismiss()
+		self.on_enter()
+
+	def deleteStock(self, inst):
+		"""
+		delete specific stock item
+		"""
+		itemId=inst.id
+		self.dialogDeleteItem = MDDialog(
+			title="Are You Sure?",
+			text="You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteItem
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteItem,
+					id=itemId
+				)
+			]
+		)
+		self.dialogDeleteItem.open()
+		self.item_detailPopup.dismiss()
+	def cancleDeleteItem(self, inst):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteItem.dismiss()
+
+	def sureDeleteItem(self, inst):
+		"""
+		do the delete
+		"""
+		self.dialogDeleteItem.dismiss()
+		database.deleteItem(inst.id)
+		toast("Your File Has been deleted.")
+		self.dialogDeleteItem.dismiss()
+		self.on_enter()
+
 
 	def uploadStockFromFile(self, inst):
 		"""
@@ -648,7 +1080,7 @@ class Home(MDScreen):
 		path = os.path.expanduser("~")
 		self.item_manager.show(path)
 		self.manager_open = True
-	def newStock(self, inst):
+	def newStock(self):
 		"""
 		new individual stock
 		"""
@@ -668,25 +1100,8 @@ class Home(MDScreen):
 		self.dialogNewStock.open()
 	def closeNewStock(self, inst):
 		#self.stock_tables.update_row_data(inst, self.itemList)
-		self.stockFunc()
+		self.on_enter()
 		self.dialogNewStock.dismiss()
-
-	'''def customerFunc(self):
-		"""
-		When customer tab selected
-		"""
-		self.customerTab.clear_widgets()
-		customersList = database.readSCustomer()
-		for x in customersList:
-			self.customerTab.add_widget(MDCustomCard(
-				customerName = x[1],
-				companyName = x[2],
-				customerTinNumber = str(x[5]),
-				customerPhoneNumber = str(x[4]),
-				totalPurchased = str(x[6]),
-				#itemPurchased = database.read,
-			))
-			#self.customerTab.add_widget(customerCard)'''
 
 	def newCustomer(self):
 		"""
@@ -1140,7 +1555,7 @@ class main(MDApp):
 	"""
 	currentTime = datetime.now()
 	Hr = currentTime.hour
-
+	ToDay = date.today()
 	def build(self, first=False):
 		"""
 		build method

@@ -2,13 +2,16 @@
 """
 To manage sqlite database
 """
+from ast import Pass
 import sqlite3
 conn = sqlite3.connect('store.db')
 c = conn.cursor()
 def createTables():
+    # DON'T USE THIS QUERY SINCE THERE IS A LOT OF CHANGES
     #c.execute("CREATE TABLE if not exists customers(customerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, customerName TEXT NOT NULL, customerTinNumber INT NOT NULL, customerRegion TEXT NOT NULL, customerSubcity TEXT NOT NULL, customerWereda INT NOT NULL, customerPhoneN INT NOT NULL, accountCreatedDate TEXT NOT NULL, frequencyOfPurchase INT NOT NULL, totalPurchase INT NOT NULL, bankAccountNumber INT NOT NULL)")
-    c.execute("CREATE TABLE if not exists inventory(itemId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemName TEXT NOT NULL, itemQuantity INT NOT NULL, purchasedPrice REAL NOT NULL, purchasedDate TEXT NOT NULL, sellingPriceCherecharo REAL NOT NULL, sellingPriceBulk REAL NOT NULL, updatedAt TEXT NOT NULL)")
-    c.execute("CREATE TABLE if not exists sales(salesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemId INT NOT NULL, customerId INT NOT NULL, itemQuantitiy INT NOT NULL, soldDate TETX NOT NULL, wayOfPayment TEXT NOT NULL, salesRevenue INT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists inventory(itemId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemName TEXT NOT NULL, itemQuantity INT NOT NULL, purchasedPrice REAL NOT NULL, purchasedDate TEXT NOT NULL, sellingPriceCherecharo REAL NOT NULL, sellingPriceBulk REAL NOT NULL, updatedAt TEXT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists sales(salesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemId INT NOT NULL, customerId INT NOT NULL, itemQuantitiy INT NOT NULL, soldDate TETX NOT NULL, wayOfPayment TEXT NOT NULL, salesRevenue INT NOT NULL)")
+    pass
 
 # here performing basic CRUD
 # create
@@ -35,21 +38,21 @@ def insertCustomer(cName, compName, cTinNumber, custCity, cPhoneNumber, createdD
     conn.commit()
     print('data inserted successfully')
 
-def insertItem(iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk):
+def insertItem(iName, iQuantity, purchasedDate, priceCherecharo, priceBulk):
     """
     insert function for Item table
     """
     # initaly updateAt == purchaseDate 
     # so no need to accept updateAt argument
-    c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedPrice, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(?, ?, ?, ?, ?, ?, ?)", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, purchasedDate))
+    c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(?, ?, ?, ?, ?, ?)", (iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, purchasedDate))
     print('data inserted successfully')
     conn.commit()
 
-def insertSales(itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue):
+def insertSales(itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId):
     """
     insert function for sales table
     """
-    c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, wayOfPayment, salesRevenue) VALUES(?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue))
+    c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, salesRevenue, bankId) VALUES(?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId))
     conn.commit()
 
 # read
@@ -94,7 +97,7 @@ def readCustomer():
     customers = c.fetchall()
     return customers
 
-def deatilCustomer(CID):
+def detailCustomer(CID):
     """
     retrive all the information from database
     """
@@ -122,7 +125,7 @@ def detailItem(CID):
     """
     retrive all the information from database
     """
-    c.execute("SELECT * FROM inventory where itemId=?", (CID, ))
+    c.execute("SELECT * FROM inventory where itemId= ?", (int(CID),))
     customer = c.fetchone()
     return customer
 
@@ -131,7 +134,7 @@ def readSItem():
     """
     selecting only specific columns
     """
-    c.execute("SELECT itemId, itemName, itemQuantity, purchasedPrice, sellingPriceCherecharo, sellingPriceBulk FROM inventory")
+    c.execute("SELECT itemId, itemName, itemQuantity, sellingPriceCherecharo FROM inventory")
     items = c.fetchall()
     cToList = []
     for x in items:
@@ -144,7 +147,7 @@ def readSomeSales():
     """
     some amount of sales
     """
-    c.execute("SELECT itemId, itemQuantitiy, salesRevenue, soldDate FROM sales")
+    c.execute("SELECT itemId, itemQuantitiy, salesRevenue, soldDate, salesId FROM sales")
     sales = c.fetchall()
     cToList = []
     for x in sales:
@@ -159,6 +162,15 @@ def readSales():
     sales = c.fetchall()
     return sales
 
+def detailSales(SID):
+    """
+    retrive all the information from database
+    """
+    c.execute("SELECT * FROM sales where salesId= ?", (SID,))
+    sales = c.fetchone()
+    return sales
+
+
 def readCustomerSales(Id):
     """
     sales made by specific customer
@@ -172,21 +184,21 @@ def updateCustomer(cId, cName, compName, cTinNumber, custCity, cPhoneNumber, cre
     """
     updates customer database
     """
-    c.execuste("UPDATE customers SET customerName = ?, companyName = ?, customerTinNumber = ?, customerCity = ?, customerPhoneN = ?, accountCreatedDate = ?, frequencyOfPurchase = ?, totalPurchase = ?, bankAccountNumber = ? WHERE customerId = ?", (cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc, cId))
+    c.execute("UPDATE customers SET customerName = ?, companyName = ?, customerTinNumber = ?, customerCity = ?, customerPhoneN = ?, accountCreatedDate = ?, frequencyOfPurchase = ?, totalPurchase = ?, bankAccountNumber = ? WHERE customerId = ?", (cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, int(frequencyPurcases), int(totPurchases), int(bankAcc), cId))
     conn.commit()
 
-def updateItem(iId, iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk):
+def updateItem(iId, iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, updateAt):
     """
     update item database
     """
-    c.execute("UPDATE inventory SET itemName = ?, itemQuantity = ?, purchasedPrice = ?, purchasedDate = ?, sellingPriceCherecharo = ?, sellingPriceBulk = ?, updatedAt = ? WEHRE itemID = ?", (iName, iQuantity,  purchasedPrice, purchasedDate, priceCherecharo, priceBulk, iId))
+    c.execute("UPDATE inventory SET itemName = ?, itemQuantity = ?, purchasedDate = ?, sellingPriceCherecharo = ?, sellingPriceBulk = ?, updatedAt = ? WHERE itemID = ?", (iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, updateAt, iId))
     conn.commit()
 
-def updateSales(sId, itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, bankName):
+def updateSales(sId, itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId):
     """
     update sales database
     """
-    c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantity = ?, soldDate = ?, wayOfPayment = ?, salesRevenue = ?, bankName = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, paymentWay, salesRevenue, sId, bankName))
+    c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantitiy = ?, soldDate = ?, salesRevenue = ?, bankId = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId, sId))
     conn.commit()
 
 def updateExpenses(eId, eType, eName, eAmount, eDate):

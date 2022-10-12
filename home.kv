@@ -1,4 +1,218 @@
 #:kivy 2.1.0
+#:import Home main.Home
+
+<Edit_Sales_layout>
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    itemId: itemId
+    customerId: customerId
+    bankId: bankId
+    itemQuantity: itemQuantity
+    soldAt: soldAt
+    salesRevenu: salesRevenu
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                id: bank_mdEdit
+                spacing: "7dp"
+                MDTextField:
+                    id: itemId
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Item Id'
+                    text: ""
+                MDTextField:
+                    id: customerId
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Customer Id'
+                    text: ""
+                MDTextField:
+                    id: bankId
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Bank Id'
+                    text: ""
+                MDTextField:
+                    id: itemQuantity
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Item Quantity'
+                    text: ""
+                MDTextField:
+                    id: soldAt
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Sold Date'
+                    text: ""
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, app.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+                MDTextField:
+                    id: salesRevenu
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Sales Revenue'
+                    text: ""
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
+
+<Edit_Item_layout>
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    itemName: itemName
+    itemQuantity: itemQuantity
+    purchasedAt: purchasedAt
+    sellingPS: sellingPS
+    sellingPB: sellingPB
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                id: bank_mdEdit
+                spacing: "7dp"
+                MDTextField:
+                    id: itemName
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Item Name'
+                    text: ""
+                MDTextField:
+                    id: itemQuantity
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Quantity'
+                    text: ""
+                MDTextField:
+                    id: purchasedAt
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Purchased At'
+                    text: ""
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, app.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+                MDTextField:
+                    id: sellingPS
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Selling Price Single'
+                    text: ""
+                MDTextField:
+                    id: sellingPB
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Selling Price Bulk'
+                    text: ""
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
+<Edit_Customer_layout>
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    customerName: customerName
+    companyName: companyName
+    tinNumber: tinNumber
+    customerCity: customerCity
+    customerPhoneN: customerPhoneN
+    accountCreatedAt: accountCreatedAt
+    frequencyOfP: frequencyOfP
+    totalP: totalP
+    accountNumber: accountNumber
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                id: bank_mdEdit
+                spacing: "7dp"
+                MDTextField:
+                    id: customerName
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Customer Name'
+                    text: ""
+                MDTextField:
+                    id: companyName
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Company Name'
+                    text: ""
+                MDTextField:
+                    id: tinNumber
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Tin Number'
+                    text: ""
+                MDTextField:
+                    id: customerCity
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'City'
+                    text: ""
+                MDTextField:
+                    id: customerPhoneN
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Phone Number'
+                    text: ""
+                MDTextField:
+                    id: accountCreatedAt
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Created At'
+                    text: ""
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, app.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+                MDTextField:
+                    id: frequencyOfP
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Frequency Of Purchase'
+                    text: ""
+                MDTextField:
+                    id: totalP
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Total Purchase'
+                    text: ""
+                MDTextField:
+                    id: accountNumber
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Account Number'
+                    text: ""
+
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
+
 <New_sales_layout>
 	id: new_sales_layout
 	orientation: "vertical"
@@ -7,16 +221,15 @@
 	size_hint_y: None
 	height: "400dp"
     item_id: item_id
-    customer_id: t
+    customer_id: customer_id
     item_quantitiy: item_quantitiy
     sold_date: sold_date
-    way_of_payment: way_of_payment
     sales_revenue: sales_revenue
-    bank_name: bank_name
+    bank_id: bank_id
 	ScrollView:
 		smooth_scroll_end: 10
 		MDList:
-			spacing: "5dp"
+			spacing: "15dp"
             MDTextField:
                 # here make here to select from dropDown list
                 # or to add it CORRECTLY manualy then search for it in the code
@@ -24,6 +237,7 @@
                 multiline: False
                 mode: "rectangle"
                 hint_text: 'item id'
+                on_focus: if self.focus: root.listItem.open()
             MDTextField:
                 # here mtake here to select from dropDown list
                 # or to add it CORRECTLY manualy then search for it in the code
@@ -31,6 +245,13 @@
                 multiline: False
                 mode: "rectangle"
                 hint_text: 'customer id'
+                on_focus: if self.focus: root.listCustomer.open()
+            MDTextField:
+                id: bank_id
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'Bank Id(if in cash add None)'
+                on_focus: if self.focus: root.listBank.open()
             MDTextField:
                 id: item_quantitiy
                 multiline: False
@@ -40,22 +261,22 @@
                 id: sold_date
                 multiline: False
                 mode: "rectangle"
-                hint_text: 'Date(dd/mm/yy)'
-            MDTextField:
-                id: way_of_payment
-                multiline: False
-                mode: "rectangle"
-                hint_text: 'Way of Payment(Bank, Cash)'
-            MDTextField:
-                id: bank_name
-                multiline: False
-                mode: "rectangle"
-                hint_text: 'Bank Name(if in cash add None)'
+                validator: "date"
+                date_format: "dd/mm/yyyy"
+                date_interval: None, app.ToDay
+                hint_text: "sales date(01/01/2022)"
+                helper_text: "use dd/mm/yyyy format date"
+                icon_right: "calendar"
+                # here to load calendar
+                #on_focus: if self.focus: 
             MDTextField:
                 id: sales_revenue
                 multiline: False
                 mode: "rectangle"
                 hint_text: 'Sales Revenue'
+
+                # here add the normal price quantity*price_of_quantity
+                on_focus: if self.focus: root.calSalesReve()
             MDRaisedButton:
             #divider: 'Inset'
                 text: 'Save'
@@ -132,11 +353,52 @@
                 text: 'Save'
                 on_release: root.addNewCustomer()
 
+<Detail_sales_layout>
+    id: detail_sales_layout
+	orientation: "vertical"
+	spacing: "20sp"
+	md_bg_color: app.theme_cls.bg_dark
+	size_hint_y: None
+	height: "400dp"
+    itemId: itemId
+    customerId: customerId
+    bankId: bankId
+    itemQuantity: itemQuantity
+    soldAt: soldAt
+    salesRevenu: salesRevenu
+    ScrollView:
+        smooth_scroll_end: 10
+        MDList:
+            TwoLineListItem:
+                id: itemId
+                text: 'Item Id'
+                secondary_text: ''
+            TwoLineListItem:
+                id: customerId
+                text: 'customer Id'
+                secondary_text: ''
+            TwoLineListItem:
+                id: bankId
+                text: 'Bank Id'
+                secondary_text: ''
+            TwoLineListItem:
+                id: itemQuantity
+                text: 'Item Quantity'
+                secondary_text: ''
+            TwoLineListItem:
+                id: soldAt
+                text: 'Sold Date'
+                secondary_text: ''
+            TwoLineListItem:
+                id: salesRevenu
+                text: 'Sales Revenu'
+                secondary_text: ''
+
+
 <Detail_item_layout>
     id: detail_item_layout
     item_name: item_name
     item_quantity: item_quantity
-    purchased_price: purchased_price
     purchased_date: purchased_date
     single_selling_price: single_selling_price
     bulk_selling_price: bulk_selling_price
@@ -156,10 +418,6 @@
             TwoLineListItem:
                 id: item_quantity
                 text: 'Quantity'
-                secondary_text: ''
-            TwoLineListItem:
-                id: purchased_price
-                text: 'Purchased Price'
                 secondary_text: ''
             TwoLineListItem:
                 id: purchased_date
@@ -187,7 +445,6 @@
 	size_hint_y: None
     item_name: item_name
     item_quantity: item_quantity
-    purchased_price: purchased_price
     purchased_date: purchased_date
     selling_price_single: selling_price_single
     selling_price_bulk: selling_price_bulk
@@ -208,12 +465,6 @@
                 mode: "rectangle"
                 hint_text: 'Item Quantity'
                 #text: '5'
-            MDTextField:
-                id: purchased_price
-                multiline: False
-                mode: "rectangle"
-                hint_text: 'Purchased Price'
-                #text: '10'
             MDTextField:
                 id: purchased_date
                 multiline: False
@@ -243,6 +494,7 @@
     size: '295dp', '50dp'
     pos_hint: {'center_x': .5, 'center_y': .5}
     ripple_behavior: True
+    on_press: root.sales_detail(root.salesId)
     MDBoxLayout:
         orientation: "horizontal"
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -277,33 +529,51 @@
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
+    customerCompanyName: customerCompanyName
     pos_hint: {'center_x': .5, 'center_y': .5}
     elevation: 3
-    ripple_behavior: True
+    _no_ripple_effect: True
     MDBoxLayout:
         orientation: 'vertical'
-        TwoLineAvatarIconListItem:
-            id: customerCompanyName
-            markup: True
-            id: companyAndCustomerName
-            text: '[b]  '+root.companyName+'[/b]'
-            secondary_text: '   '+root.customerName
-            divider_color: app.theme_cls.primary_dark
-            radius: [15, 15, 0, 0]
-            elevation: 3
-            #tertiary_text: #customer_id
-            IconLeftWidget:
-                icon: "account-circle"
-                icon_size: "50sp"
-                theme_icon_color: "Custom"
-                disabled_color: app.theme_cls.primary_dark
-                disabled: True
-            IconRightWidget:
-                icon: "pencil-outline"
-                icon_size: "30sp"
-                theme_icon_color: "Custom"
-                icon_color: app.theme_cls.primary_dark
-                on_release:
+        MDCardSwipe:
+            size_hint_y: None
+            height: customerCompanyName.height
+            MDCardSwipeLayerBox:
+                padding: "8dp"
+                radius: [15,15,0,0]
+                md_bg_color: (243/255, 63/255, 63/255, 1)
+                #customerId: root.customerId
+                MDIconButton:
+                    icon: "trash-can"
+                    pos_hint: {"center_y": .5}
+                    #on_release: root.home.deleteCustomer(root.customerId)
+                    on_release: root.deleteCustomer()
+            MDCardSwipeFrontBox:
+                radius: [15,15,0,0]
+                TwoLineAvatarIconListItem:
+                    id: customerCompanyName
+                    markup: True
+                    #_no_ripple_effect: True
+                    text: '[b]  '+root.companyName+'[/b]'
+                    secondary_text: '   '+root.customerName
+                    divider_color: app.theme_cls.primary_dark
+                    #customerId: root.customerId
+                    radius: [15, 15, 0, 0]
+                    elevation: 3
+                    #tertiary_text: #customer_id
+                    IconLeftWidget:
+                        icon: "account-circle"
+                        icon_size: "50sp"
+                        theme_icon_color: "Custom"
+                        disabled_color: app.theme_cls.primary_dark
+                        disabled: True
+                    IconRightWidget:
+                        icon: "pencil-outline"
+                        icon_size: "30sp"
+                        theme_icon_color: "Custom"
+                        icon_color: app.theme_cls.primary_dark
+                        #on_release: root.home.editCustomer(root.customerId)
+                        on_release: root.editCustomer()
         MDBoxLayout:
             orientation: 'horizontal'
             spacing: "15sp"
@@ -337,7 +607,7 @@
                     halign: 'center'
                     line_width: 1.5
                     disabled: True
-                    text: 'Total Purchase\n' + root.totalPurchased
+                    text: 'Total Purchase\n' + str(root.totalPurchased)
                 
             ScrollView:
                 size_hint_x: .2
@@ -352,12 +622,12 @@
     focus_behavior: True
     size_hint: None, None
     size: '305dp', '105dp'
+    #size: root.winSize[0]*.95, '105dp'
+    #adaptive_width: True
+    #size: self.minimum_size
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
-    #unfocus_color: root.unfocu_color
-    #focus_color: root.focu_color
-    #md_bg_color: root.unfocu_color
     elevation: 3
     ripple_behavior: True
     MDRelativeLayout:
@@ -389,6 +659,7 @@
             CircularProgressBar:
                 size_hint: None, None
                 size: 50, 50
+                adaptive_size: True
                 pos_hint: {"x": .75, "y": .3}
                 value: root.cpbValue
                 bar_color: root.cpbBarColor
@@ -416,9 +687,10 @@
 
 Home:
     name: "home"
-    tock_tab: tock_tab
+    tock_tab: tock_tab.__self__
     customerTab: customerTab
     salesTab: salesTab
+    monthDropDownMenuCaller: monthDropDownMenuCaller
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -520,7 +792,7 @@ Home:
                         widget_position: 'top'
                         title: "Stock"
                         left_action_items: [["sort-variant"]]
-                        right_action_items: [["tune-variant"]]
+                        right_action_items: [["plus", lambda x: root.newStock(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_normal
                         elevation: 1
@@ -561,7 +833,8 @@ Home:
                         OneLineAvatarIconListItem:
                             id: monthDropDownMenuCaller
                             markup: True
-                            text: 'October'
+                            _no_ripple_effect: True
+                            text: ''
                             radius: [15,15,15,15]
                             valign: 'center'
                             pos_hint: {'center_y': .5}
@@ -594,7 +867,7 @@ Home:
                                 pos_hint: {'center_x': .5}
                                 spacing: 10
                                 radius: [0,0,15,15]
-                                padding: 10
+                                padding: 3
                                 MDRoundFlatButton:
                                     pos_hint: {'center_x': .5, 'center_y': .5}
                                     size_hint_x: .25
@@ -642,7 +915,7 @@ Home:
                     MDTopAppBar:
                         widget_position: 'top'
                         title: "Customers"
-                        left_action_items: [["sort-variant"]]
+                        left_action_items: [["refresh", lambda x: root.reFresh(), "Refresh"]]
                         right_action_items: [["plus", lambda x: root.newCustomer(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_normal

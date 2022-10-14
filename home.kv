@@ -1,6 +1,14 @@
 #:kivy 2.1.0
 #:import Home main.Home
 
+<BankConfirm>
+    on_release: root.set_icon(check)
+    CheckboxLeftWidget:
+        id: check
+        group: "check"
+        disabled: True
+        disabled_color: app.theme_cls.primary_color
+
 <Edit_Sales_layout>
     orientation: "vertical"
     spacing: "20sp"
@@ -492,32 +500,41 @@
     focus_behavior: True
     size_hint: None, None
     size: '295dp', '50dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
     pos_hint: {'center_x': .5, 'center_y': .5}
     ripple_behavior: True
+    elevation: 4
     on_press: root.sales_detail(root.salesId)
+    padding: [0,0,5,0]
     MDBoxLayout:
         orientation: "horizontal"
         pos_hint: {'center_x': .5, 'center_y': .5}
         padding: 10
         spacing: "5sp"
-        MDTextButton:
+        MDLabel:
             id: salesName
-            size_hint_x: .25
+            markup: True
+            font_size: '13sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.salesName
-        MDTextButton:
+        MDLabel:
             id: salesQty
-            size_hint_x: .25
+            markup: True
+            font_size: '14sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.salesQty
-        MDTextButton:
+        MDLabel:
             id: salesAmount
-            size_hint_x: .25
+            markup: True
+            font_size: '14sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.salesAmount
-        MDTextButton:
+        MDLabel:
             id: salesDate
-            size_hint_x: .25
+            markup: True
+            font_size: '11sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.salesDate
 
@@ -615,7 +632,6 @@
                 MDList:
                     id: itemPurchased
                     spacing: "4dp"
-            
 
 
 <MDashCard>
@@ -628,7 +644,7 @@
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
-    elevation: 3
+    elevation: 4
     ripple_behavior: True
     MDRelativeLayout:
         MDLabel:
@@ -664,6 +680,85 @@
                 value: root.cpbValue
                 bar_color: root.cpbBarColor
 
+
+<TopClientsListItem>
+    focus_behavior: True
+    ripple_behavior: True
+    size_hint: None, None
+    size: '305dp', '60dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    elevation: 2
+    radius: [0,0,0,0]
+    MDBoxLayout:
+        orientation: 'horizontal'
+        MDIconButton:
+            icon: "account"
+            disabled: True
+            icon_size: "34sp"
+            theme_icon_color: "Custom"
+            pos_hint: {"center_x":.1, "center_y":.5}
+            disabled_color: [167/255, 167/255, 167/255, .7]
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                bold: True
+                halign: 'left'
+                pos_hint: {"x":.1, "y":.5}
+                font_size: '16sp'
+                text: root.client_name
+            MDLabel:
+                bold: True
+                halign: 'left'
+                pos_hint: {"x":.1, "y":.4}
+                font_size: '14sp'
+                text: root.company_name
+                color: [167/255, 167/255, 167/255, .7]
+        MDBoxLayout:
+            orientation: 'vertical'
+            MDLabel:
+                text: ''
+                pos_hint: {'y': .5, 'x':.5}
+                #halign: 'right'
+            MDLabel:
+                #bold: True
+                #halign: 'right'
+                pos_hint: {"x":.5, "y":.4}
+                font_size: '14sp'
+                text: root.amount
+                color: [167/255, 167/255, 167/255, .7]
+
+<BarChart>
+    size_hint: None, None
+    adaptive_size: True
+    canvas.after:
+        Color:
+            rgba: root.bar_color +[.9]
+        RoundedRectangle:
+            pos: (self.x, self.y)
+            size: self.width, root.set_value/7 # here the dividing factor dpendes on her avg daily sales revenue which will be adjusted by that
+            radius: [self.width / 4,]
+
+    MDLabel:
+        markup: True
+        text: root.text
+        bold: True
+        font_size: "12sp"
+        pos_hint: {"center_x": .5, "y": ((root.set_value/1000)-.4)}
+        halign: "center"
+        color: root.bar_color
+
+    MDLabel:
+        text: root.refer
+        bold: True
+        font_size: "11sp"
+        pos_hint: {"center_x": .5, "y":-.55}
+        halign: "center"
+        color: root.bar_color
+
+
 <CircularProgressBar>
     canvas.before:
         Color:
@@ -691,6 +786,11 @@ Home:
     customerTab: customerTab
     salesTab: salesTab
     monthDropDownMenuCaller: monthDropDownMenuCaller
+    cashBank_tab: cashBank_tab
+    cashCash_tab: cashCash_tab
+    barChartSales: barChartSales
+    barChartProfit: barChartProfit
+    topClientsList: topClientsList
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -702,82 +802,143 @@ Home:
                 name: 'dashboard'
                 text: 'Home'
                 icon: 'home-outline'
-                DashBoard:
-                    MDScreen:
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: 20
+                    MDTopAppBar:
+                        widget_position: 'top'
+                        title: "DashBoard"
+                        left_action_items: [["sort-variant"]]
+                        right_action_items: [["tune-variant", lambda x:app.gotoSetting(), "Settings"]]
+                        specific_text_color: app.theme_cls.opposite_bg_normal
+                        md_bg_color: app.theme_cls.bg_normal
+                        elevation: 1
+                    ScrollView:
+                        do_scroll_x: False
+                        smooth_scroll_end: 10
                         MDBoxLayout:
+                            adaptive_size: True
+                            padding: "10sp"
+                            spacing: "17dp"
                             orientation: 'vertical'
-                            spacing: 20
-                            MDTopAppBar:
-                                widget_position: 'top'
-                                title: "DashBoard"
-                                left_action_items: [["sort-variant"]]
-                                right_action_items: [["tune-variant", lambda x:app.gotoSetting(), "Settings"]]
-                                specific_text_color: app.theme_cls.opposite_bg_normal
-                                md_bg_color: app.theme_cls.bg_normal
-                                elevation: 1
-                            ScrollView:
-                                do_scroll_x: False
-                                smooth_scroll_end: 10
+                            pos_hint: {"center_x": .5, "center_y": .5}
+                            MDLabel:
+                                markup: True
+                                text: 'Hello Bety'
+                                bold: True
+                                font_size: '28sp'
+                            MDLabel:
+                                text: ''    
+                            MDLabel:
+                                font_size: '15sp'
+                                text: 'Welcome Back!'
+                                color: [167/255, 167/255, 167/255, .5]
+                            MDashCard:
+                                id: sales
+                                focu_color: 1, 0, 100/255, .2
+                                unfocu_color: 1, 0, 100/255, .15
+                                text1: 'Sales'
+                                text2: '$40000'
+                                text3: 'New Sales This Month'
+                                updownIcon: 'arrow-top-right'
+                                cpbValue: 37
+                                cpbBarColor: [250/255, 115/255, 0]
+                            MDBoxLayout:
+                                id: barChartSales
+                                size_hint_y: .7
+                                orientation: 'horizontal'
+                                spacing: "13dp"
+                                padding: "7dp"
+                                adaptive_size: True
+                            MDashCard:
+                                id: profitCard
+                                focu_color: 1, 0, 100/255, .2
+                                unfocu_color: 1, 0, 100/255, .15
+                                text1: 'Profit'
+                                text2: '$40000'
+                                text3: 'Total Profit This Month'
+                                updownIcon: 'arrow-top-right'
+                                cpbValue: 42
+                                cpbBarColor: [38/255, 255/255, 0]
+                            MDBoxLayout:
+                                id: barChartProfit
+                                size_hint_y: .7
+                                orientation: 'horizontal'
+                                spacing: "13dp"
+                                padding: "7dp"
+                                adaptive_size: True
+
+                            MDashCard:
+                                id: customersCard
+                                focu_color: 1, 0, 100/255, .2
+                                unfocu_color: 1, 0, 100/255, .15
+                                text1: 'Clients'
+                                text2: '40000'
+                                text3: 'Total Clients'
+                                updownIcon: 'arrow-top-right'
+                                cpbValue: 67
+                                cpbBarColor: [0, 163/255, 250/255]
+                            MDBoxLayout:
+                                orientation: "vertical"
+                                adaptive_size: True
+                                MDCard:
+                                    #focus_behavior: True
+                                    size_hint: None, None
+                                    size: '305dp', '55dp'
+                                    unfocus_color: app.theme_cls.bg_normal
+                                    focus_color: app.theme_cls.bg_dark
+                                    md_bg_color: app.theme_cls.bg_normal
+                                    pos_hint: {'center_x': .5, 'center_y': .5}
+                                    elevation: 3
+                                    radius: [10,10,0,0]
+                                    MDGridLayout:
+                                        cols: 2
+                                        MDBoxLayout:
+                                            orientation: 'vertical'
+                                            MDLabel:
+                                                pos_hint: {'y': .5, 'x':.1}
+                                                bold: True
+                                                text: 'Top Clients'
+                                            MDLabel:
+                                                pos_hint: {'y': .4, 'x':.1}
+                                                color: [167/255, 167/255, 167/255, .7]
+                                                font_size: "12sp"
+                                                bold: True
+                                                text: "C L I E N T  N A M E"
+                                        MDBoxLayout:
+                                            orientation: 'vertical'
+                                            MDLabel:
+                                                text: ''
+                                                pos_hint: {'y': .5, 'x':.5}
+                                                #halign: 'right'
+                                            MDLabel:
+                                                #halign: 'right'
+                                                color: [167/255, 167/255, 167/255, .7]
+                                                pos_hint: {'y': .4, 'x':.5}
+                                                font_size: "12sp"
+                                                bold: True 
+                                                text: "A M O U N T"
                                 MDBoxLayout:
-                                    adaptive_size: True
-                                    padding: "10sp"
-                                    spacing: "17dp"
+                                    #size_hint_y: .7
                                     orientation: 'vertical'
-                                    pos_hint: {"center_x": .5, "center_y": .5}
-                                    MDLabel:
-                                        markup: True
-                                        text: 'Hello Bety'
-                                        bold: True
-                                        font_size: '28sp'
-                                    MDLabel:
-                                        text: ''    
-                                    MDLabel:
-                                        font_size: '15sp'
-                                        text: 'Welcome Back!'
-                                        color: [167/255, 167/255, 167/255, .5]
-                                    MDashCard:
-                                        id: sales
-                                        focu_color: 1, 0, 100/255, .2
-                                        unfocu_color: 1, 0, 100/255, .15
-                                        text1: 'Sales'
-                                        text2: '$40000'
-                                        text3: 'New Sales This Month'
-                                        updownIcon: 'arrow-top-right'
-                                        cpbValue: 37
-                                        cpbBarColor: [250/255, 115/255, 0]
-                                    MDashCard:
-                                        id: profitCard
-                                        focu_color: 1, 0, 100/255, .2
-                                        unfocu_color: 1, 0, 100/255, .15
-                                        text1: 'Profit'
-                                        text2: '$40000'
-                                        text3: 'Total Profit This Month'
-                                        updownIcon: 'arrow-bottom-right'
-                                        cpbValue: 42
-                                        cpbBarColor: [38/255, 255/255, 0]
-                                    MDashCard:
-                                        id: customersCard
-                                        focu_color: 1, 0, 100/255, .2
-                                        unfocu_color: 1, 0, 100/255, .15
-                                        text1: 'Customers'
-                                        text2: '40000'
-                                        text3: 'New customers this month'
-                                        updownIcon: 'arrow-top-right'
-                                        cpbValue: 67
-                                        cpbBarColor: [0, 163/255, 250/255]
-                                    MDashCard:
-                                        id: customersCard
-                                        focu_color: 1, 0, 100/255, .2
-                                        unfocu_color: 1, 0, 100/255, .15
-                                        text1: 'Expense'
-                                        text2: '$40000'
-                                        text3: 'Total expense This Month'
-                                        updownIcon: 'arrow-bottom-right'
-                                        cpbValue: 22
-                                        cpbBarColor: [1, 0, 100/255]
-                                        on_release: 
-                                            root.manager.transition.direction = "left"
-                                            root.manager.current = "expense"
+                                    #spacing: "13dp"
+                                    #padding: "7dp"
+                                    adaptive_size: True
+                                    id: topClientsList
+
+                            MDashCard:
+                                id: customersCard
+                                focu_color: 1, 0, 100/255, .2
+                                unfocu_color: 1, 0, 100/255, .15
+                                text1: 'Expense'
+                                text2: '$40000'
+                                text3: 'Total expense This Month'
+                                updownIcon: 'arrow-bottom-right'
+                                cpbValue: 22
+                                cpbBarColor: [1, 0, 100/255]
+                                on_release: 
+                                    root.manager.transition.direction = "left"
+                                    root.manager.current = "expense"
 
 
             MDBottomNavigationItem:
@@ -798,6 +959,7 @@ Home:
                         elevation: 1
                     MDFloatLayout:
                         id: tock_tab
+                        radius: [0,0,0,0]
                         md_bg_color: app.theme_cls.bg_normal
 
                 #Stock:
@@ -815,95 +977,145 @@ Home:
                     MDTopAppBar:
                         widget_position: 'top'
                         title: "Sales"
-                        left_action_items: [["sort-variant"]]
+                        left_action_items: [["export-variant"]]
                         right_action_items: [["plus", lambda x: root.newSales(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_normal
                         elevation: 1
-                    MDCard:
-                        focus_behavior: True
-                        size_hint: None, None
-                        size: '310dp', '30dp'
-                        unfocus_color: app.theme_cls.bg_normal
-                        focus_color: app.theme_cls.bg_dark
-                        md_bg_color: app.theme_cls.bg_normal
-                        pos_hint: {'center_x': .5, 'center_y': .5}
-                        elevation: 1
-
-                        OneLineAvatarIconListItem:
-                            id: monthDropDownMenuCaller
-                            markup: True
-                            _no_ripple_effect: True
-                            text: ''
-                            radius: [15,15,15,15]
-                            valign: 'center'
-                            pos_hint: {'center_y': .5}
-                            divider: None
-                            #divider_color: app.theme_cls.primary_dark
-                            #size_hint_y: .18
-                            IconRightWidget:
-                                icon: "chevron-down"
-                                icon_size: "30sp"
-                                theme_icon_color: "Custom"
-                                icon_color: app.theme_cls.primary_dark
-                                on_release: root.main_monthMenu.open()
-
-                    MDCard:
-                        focus_behavior: True
-                        size_hint: None, None
-                        size: '310dp', '420dp'
-                        unfocus_color: app.theme_cls.bg_normal
-                        focus_color: app.theme_cls.bg_dark
-                        md_bg_color: app.theme_cls.bg_normal
-                        pos_hint: {'center_x': .5}
-                        elevation: 3
-                        #ripple_behavior: True
+                    ScrollView:
+                        do_scroll_x: False
+                        do_scroll_y: False
+                        smooth_scroll_end: 10
                         MDBoxLayout:
-                            orientation: "vertical"
+                            orientation: 'vertical'
+                            spacing: 0
+                            padding: 8
                             pos_hint: {'center_x': .5, 'center_y': .5}
-                            MDBoxLayout:
-                                orientation: "horizontal"
-                                size_hint_y: .2
-                                pos_hint: {'center_x': .5}
-                                spacing: 10
-                                radius: [0,0,15,15]
-                                padding: 3
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .25
-                                    text: 'Item'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .25
-                                    text: 'Qty'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .25
-                                    text: 'Amount'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .25
-                                    text: 'Date'
-                            ScrollView:
-                                do_scroll_x: False
-                                smooth_scroll_end: 10
-                                size_hint_y: .8
+                            adaptive_size: True
+                            MDCard:
+                                size_hint: None, None
+                                size: '310dp', '30dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                elevation: 1
                                 MDBoxLayout:
-                                    id: salesTab
-                                    adaptive_size: True
-                                    padding: "10sp"
-                                    spacing: "7sp"
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    orientation: 'vertical'
-                    
+                                    orientation: "horizontal"
+                                    MDLabel:
+                                        id: monthDropDownMenuCaller
+                                        text: ''
+                                        font_size: '20sp'
+                                        bold: True
+                                        #halign: 'left'
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDIconButton:
+                                        icon: "chevron-down"
+                                        icon_size: "30sp"
+                                        halign: 'right'
+                                        theme_icon_color: "Custom"
+                                        pos_hint: {'center_y': .5, 'x': .8}
+                                        on_release: root.main_monthMenu.open()
+                            MDCard:
+                                focus_behavior: False
+                                size_hint: None, None
+                                size: '310dp', '420dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5}
+                                elevation: 3
+                                #ripple_behavior: True
+                                MDFloatLayout:
+                                    MDBoxLayout:
+                                        orientation: "vertical"
+                                        pos_hint: {'center_x': .5, 'center_y': .5}
+                                        MDCard:
+                                            #focus_behavior: True
+                                            size_hint: None, None
+                                            size: '305dp', '50dp'
+                                            unfocus_color: app.theme_cls.bg_normal
+                                            focus_color: app.theme_cls.bg_dark
+                                            md_bg_color: app.theme_cls.bg_normal
+                                            pos_hint: {'center_x': .5, 'center_y': .5}
+                                            elevation: 3
+                                            radius: [10,10,0,0]
+                                            MDGridLayout:
+                                                cols: 4
+                                                padding: "12sp"
+                                                spacing: "7sp"
+                                                adaptive_height: True
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Item'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Qty'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Amount'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Date'
+                                                    color: [167/255, 167/255, 167/255, .7]                                    
+                                        ScrollView:
+                                            do_scroll_x: False
+                                            smooth_scroll_end: 10
+                                            size_hint_y: .8
+                                            MDBoxLayout:
+                                                id: salesTab
+                                                adaptive_size: True
+                                                padding: "10sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                orientation: 'vertical'
+                                                            
 
             MDBottomNavigationItem:
                 name: 'cashFlow'
                 text: 'Cash'
                 icon: 'wallet-outline'
-                MDLabel:
-                    text: 'Cash flow'
-                    halign: 'center'
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    spacing: "5dp"
+                    MDTopAppBar:
+                        widget_position: 'top'
+                        title: "Cash"
+                        left_action_items: [["sort-variant"]]
+                        right_action_items: [["plus"]]
+                        specific_text_color: app.theme_cls.opposite_bg_normal
+                        md_bg_color: app.theme_cls.bg_darkest
+                        elevation: 1
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        #adaptive_size: True
+                        MDLabel:
+                            text: 'Bank'
+                            font_size: '20sp'
+                            adaptive_size: True                            
+                            bold: True
+                            pos_hint: {'center_y': .5, 'x': .1}
+                            color: [167/255, 167/255, 167/255, .7]
+                        MDBoxLayout:
+                            id: cashBank_tab
+                            orientation: 'vertical'
+                            #md_bg_color: app.theme_cls.bg_normal
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        MDLabel:
+                            text: 'Cash'
+                            font_size: '20sp'
+                            adaptive_size: True                            
+                            bold: True
+                            pos_hint: {'center_y': .5, 'x': .1}
+                            color: [167/255, 167/255, 167/255, .7]
+                        MDFloatLayout:
+                            id: cashCash_tab                        
+                            md_bg_color: app.theme_cls.bg_normal
+
 
             MDBottomNavigationItem:
                 name: 'customer'

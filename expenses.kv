@@ -71,24 +71,28 @@
     size: '295dp', '50dp'
     pos_hint: {'center_x': .5, 'center_y': .5}
     ripple_behavior: True
+    elevation: 4
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
     MDBoxLayout:
         orientation: "horizontal"
         pos_hint: {'center_x': .5, 'center_y': .5}
         padding: 10
         spacing: "5sp"
-        MDTextButton:
+        MDLabel:
             id: expenseName
-            size_hint_x: .33
+            font_size: '13sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseName
-        MDTextButton:
+        MDLabel:
             id: expenseAmount
-            size_hint_x: .33
+            font_size: '13sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseAmount
-        MDTextButton:
+        MDLabel:
             id: expenseDate
-            size_hint_x: .33
+            font_size: '13sp'
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseDate
 
@@ -117,34 +121,34 @@ Expneses:
                     orientation: 'vertical'
                     spacing: 7
                     MDCard:
-                        focus_behavior: True
+                        #focus_behavior: True
                         size_hint: None, None
                         size: '310dp', '30dp'
-                        unfocus_color: app.theme_cls.bg_normal
-                        focus_color: app.theme_cls.bg_dark
+                        #unfocus_color: app.theme_cls.bg_normal
+                        #focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_normal
                         pos_hint: {'center_x': .5, 'center_y': .5}
                         elevation: 1
 
-                        OneLineAvatarIconListItem:
-                            id: monthDropDownMenuCaller
-                            markup: True
-                            text: 'October'
-                            radius: [15,15,15,15]
-                            valign: 'center'
-                            pos_hint: {'center_y': .5}
-                            divider: None
-                            #divider_color: app.theme_cls.primary_dark
-                            #size_hint_y: .18
-                            IconRightWidget:
+                        MDBoxLayout:
+                            orientation: "horizontal"
+                            MDLabel:
+                                id: monthDropDownMenuCaller
+                                text: 'Oct'
+                                font_size: '20sp'
+                                bold: True
+                                #halign: 'left'
+                                pos_hint: {'center_y': .5, 'x': .6}
+                            MDIconButton:
                                 icon: "chevron-down"
                                 icon_size: "30sp"
+                                halign: 'right'
                                 theme_icon_color: "Custom"
-                                icon_color: app.theme_cls.primary_dark
+                                pos_hint: {'center_y': .5, 'x': .8}
                                 on_release: root.main_monthMenu.open()
 
                     MDCard:
-                        focus_behavior: True
+                        #focus_behavior: True
                         size_hint: None, None
                         size: '310dp', '240dp'
                         unfocus_color: app.theme_cls.bg_normal
@@ -170,25 +174,24 @@ Expneses:
                                     theme_icon_color: "Custom"
                                     icon_color: app.theme_cls.primary_dark
                                     on_release: root.addFixedE()
-                            MDBoxLayout:
-                                orientation: "horizontal"
-                                size_hint_y: .2
-                                pos_hint: {'center_x': .5}
-                                spacing: 10
-                                radius: [0,0,15,15]
-                                padding: 10
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                            MDGridLayout:
+                                cols: 4
+                                padding: "12sp"
+                                spacing: "7sp"
+                                adaptive_height: True
+                                MDLabel:
+                                    bold: True
                                     text: 'Item'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                                    color: [167/255, 167/255, 167/255, .7]
+                                MDLabel:
+                                    bold: True
                                     text: 'Amount'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                                    color: [167/255, 167/255, 167/255, .7]
+                                MDLabel:
+                                    bold: True
                                     text: 'Date'
+                                    color: [167/255, 167/255, 167/255, .7]                                    
+
                             ScrollView:
                                 do_scroll_x: False
                                 smooth_scroll_end: 10
@@ -203,7 +206,7 @@ Expneses:
                                     # here is where the expenses add up by card
 
                     MDCard:
-                        focus_behavior: True
+                        #focus_behavior: True
                         size_hint: None, None
                         size: '310dp', '240dp'
                         unfocus_color: app.theme_cls.bg_normal
@@ -229,25 +232,23 @@ Expneses:
                                     theme_icon_color: "Custom"
                                     icon_color: app.theme_cls.primary_dark
                                     on_release: root.addVarE()
-                            MDBoxLayout:
-                                orientation: "horizontal"
-                                size_hint_y: .2
-                                pos_hint: {'center_x': .5}
-                                spacing: 10
-                                radius: [0,0,15,15]
-                                padding: 10
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                            MDGridLayout:
+                                cols: 4
+                                padding: "12sp"
+                                spacing: "7sp"
+                                adaptive_height: True
+                                MDLabel:
+                                    bold: True
                                     text: 'Item'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                                    color: [167/255, 167/255, 167/255, .7]
+                                MDLabel:
+                                    bold: True
                                     text: 'Amount'
-                                MDRoundFlatButton:
-                                    pos_hint: {'center_x': .5, 'center_y': .5}
-                                    size_hint_x: .33
+                                    color: [167/255, 167/255, 167/255, .7]
+                                MDLabel:
+                                    bold: True
                                     text: 'Date'
+                                    color: [167/255, 167/255, 167/255, .7]                                    
                             ScrollView:
                                 do_scroll_x: False
                                 smooth_scroll_end: 10

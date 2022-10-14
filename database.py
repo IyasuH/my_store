@@ -154,6 +154,17 @@ def readSomeSales():
         cToList.append(list(x))
     return cToList
 
+def readCashSales():
+    """
+    sales info for cash
+    """
+    c.execute("SELECT soldDate, salesRevenue, bankId, salesId FROM sales")
+    cash = c.fetchall()
+    cToList = []
+    for x in cash:
+        cToList.append(list(x))
+    return cToList
+
 def readSales():
     """
     read Sales table
@@ -185,6 +196,35 @@ def updateCustomer(cId, cName, compName, cTinNumber, custCity, cPhoneNumber, cre
     updates customer database
     """
     c.execute("UPDATE customers SET customerName = ?, companyName = ?, customerTinNumber = ?, customerCity = ?, customerPhoneN = ?, accountCreatedDate = ?, frequencyOfPurchase = ?, totalPurchase = ?, bankAccountNumber = ? WHERE customerId = ?", (cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, int(frequencyPurcases), int(totPurchases), int(bankAcc), cId))
+    conn.commit()
+
+def updateBankIdINSalesC(salesId, bankId):
+    """
+    change bankId in sales table from cash 12 to bankCID
+        here first argument is salesId
+        second argument is bankId it changed to 
+    """
+    c.execute("UPDATE sales SET bankId = ? WHERE salesId = ?", (bankId, salesId))
+    conn.commit()
+
+def getBankAmount(bankId):
+    """
+    Just to get Amount for whatever bank
+    """
+    c.execute("SELECT amount FROM bankAcc WHERE id = ?", (bankId, ))
+    amount = c.fetchone()
+    return amount
+
+def updateBankAmountC(sRevenu, bankId, cashId):
+    """
+    And here update bankAcc revenue
+        # subtract from Cash (the revenue)And
+        # Add the to given bank 
+    """
+    cashRevenu = getBankAmount(cashId)[0] - int(sRevenu)
+    bankRevenu = getBankAmount(bankId)[0] + int(sRevenu)
+    c.execute("UPDATE bankAcc SET amount = ? WHERE id = ?", (cashRevenu, cashId))
+    c.execute("UPDATE bankAcc SET amount = ? WHERE id = ?", (bankRevenu, bankId))
     conn.commit()
 
 def updateItem(iId, iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, updateAt):

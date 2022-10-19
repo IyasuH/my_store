@@ -43,7 +43,8 @@
     size_hint_y: None
     height: content.height
     MDCardSwipeLayerBox:
-        padding: "8dp"
+        padding: "20dp"
+        elevation: 3
         md_bg_color: (243/255, 63/255, 63/255, 1)
         MDIconButton:
             icon: "trash-can"
@@ -51,6 +52,8 @@
             on_release: root.deleteAccount(root.bankId)
     MDCardSwipeFrontBox:
         radius: [0,0,0,0]
+        paddin: "20dp"
+        elevation: 3
         ThreeLineAvatarIconListItem:
             id: content
             text: root.bankName
@@ -119,7 +122,7 @@
 <Bank_list_layout>
     id: new_fexpense
     orientation: "vertical"
-    spacing: "20sp"
+    spacing: "25sp"
     md_bg_color: app.theme_cls.bg_dark
     size_hint_y: None
     height: "400dp"
@@ -131,19 +134,10 @@
             spacing: "7dp"
             padding: "7dp"
             id: bank_mdlist
-        #MDBoxLayout:
-            #id: bank_mdlist
-            #orientation: 'vertical'
-            #adaptive_size: True
-            #padding: "10sp"
-            #spacing: "7sp"
-            #pos_hint: {'center_x': .5, 'center_y': .5}
-            #MDList:
-                #id: bank_mdlist
-
 
 Setting:
     name: "setting"
+    nightModeSwitch: nightModeSwitch
     MDScreen:
         MDBoxLayout:
             orientation: 'vertical'
@@ -163,7 +157,7 @@ Setting:
                     padding: 7, 0, 7, 0
                     spacing: 10
                     MDList:
-                        spacing: 1
+                        #spacing: 1
                         md_bg_color: app.theme_cls.bg_darkest
                         radius: 14, 14, 14, 14
 
@@ -172,6 +166,7 @@ Setting:
                             _txt_left_pad: "20dp"
                             size_hint_y: None
                             radius: 13, 13, 0, 0
+                            _no_ripple_effect: True
                             height: "33dp"
                             _txt_bot_pad: "6dp"
                             disabled: True
@@ -185,8 +180,8 @@ Setting:
                             bg_color: app.theme_cls.bg_darkest
                             secondary_text: "Personal info"
                             _txt_left_pad: "90dp"
-                            radius: 0, 0, 13, 13
-                            padding: 2, 0, 2, 0
+                            _no_ripple_effect: True
+                            radius: 0, 0, 14, 14
                             divider: None
                             IconLeftWidget:
                                 icon: "account-circle"
@@ -197,14 +192,14 @@ Setting:
                                 #on_release: app.edit_account_user()
 
                     MDList:
-                        spacing: 1
+                        #spacing: 1
                         md_bg_color: app.theme_cls.bg_darkest
                         radius: 14, 14, 14, 14
                         OneLineListItem:
                             text: "Bank Account"
                             _txt_left_pad: "20dp"
                             size_hint_y: None
-                            radius: 13, 13, 0, 0
+                            radius: 14, 14, 0, 0
                             height: "33dp"
                             _txt_bot_pad: "6dp"
                             disabled: True
@@ -212,8 +207,9 @@ Setting:
                             divider_color: app.theme_cls.opposite_bg_dark
                             bg_color: app.theme_cls.bg_darkest
                         OneLineAvatarIconListItem:
-                            radius: 0, 0, 13, 13
+                            radius: 0, 0, 14, 14
                             text: "Manage bank account"
+                            _no_ripple_effect: True
                             on_release: root.bankList()
                             bg_color: app.theme_cls.bg_darkest
                             divider: None
@@ -221,46 +217,45 @@ Setting:
                                 icon: 'bank'
                             IconRightWidgetWithoutTouch:
                                 icon: 'chevron-right'
-                                on_release: 
-                    MDList:
-                        spacing: 1
-                        md_bg_color: app.theme_cls.bg_darkest
-                        radius: 14, 14, 14, 14
-                        OneLineAvatarIconListItem:
-                            radius: 0, 0, 13, 13
-                            text: "Notification"
-                            #on_release: root.withdraw_money()
-                            bg_color: app.theme_cls.bg_darkest
-                            divider: None
-                            IconLeftWidgetWithoutTouch:
-                                icon: 'bell-cog'
-                            IconRightWidgetWithoutTouch:
-                                icon: 'chevron-right'
-                    MDList:
-                        spacing: 1
-                        md_bg_color: app.theme_cls.bg_darkest
-                        radius: 14, 14, 14, 14
-                        OneLineAvatarIconListItem:
-                            radius: 0, 0, 13, 13
-                            text: "Dark Mode"
-                            #on_release: root.withdraw_money()
-                            bg_color: app.theme_cls.bg_darkest
-                            divider: None
-                            IconLeftWidgetWithoutTouch:
-                                icon: 'weather-night'
-                            MDSwitch:
-                                pos_hint: {'center_x': .85, 'center_y': .5}
-                    MDList:
-                        spacing: 1
-                        md_bg_color: app.theme_cls.bg_darkest
-                        radius: 14, 14, 14, 14
-                        OneLineAvatarIconListItem:
-                            radius: 0, 0, 13, 13
-                            text: "Help"
-                            #on_release: root.withdraw_money()
-                            bg_color: app.theme_cls.bg_darkest
-                            divider: None
-                            IconLeftWidgetWithoutTouch:
-                                icon: 'lifebuoy'
-                            IconRightWidgetWithoutTouch:
-                                icon: 'chevron-right'
+                                on_release: root.bankList()
+
+                    OneLineAvatarIconListItem:
+                        radius: 13, 13, 13, 13
+                        text: "Notification"
+                        #_no_ripple_effect: True
+                        #on_release: root.withdraw_money()
+                        bg_color: app.theme_cls.bg_darkest
+                        divider: None
+                        IconLeftWidgetWithoutTouch:
+                            icon: 'bell-cog'
+                        IconRightWidgetWithoutTouch:
+                            icon: 'chevron-right'
+
+                    OneLineAvatarIconListItem:
+                        radius: 13, 13, 13, 13
+                        text: "Dark Mode"
+                        #_no_ripple_effect: True
+                        #on_release: root.withdraw_money()
+                        bg_color: app.theme_cls.bg_darkest
+                        divider: None
+                        #on_release: root.changeNightMode()
+                        IconLeftWidgetWithoutTouch:
+                            icon: 'weather-night'
+                        MDSwitch:
+                            id: nightModeSwitch
+                            pos_hint: {'center_x': .8, 'center_y': .4}
+                            active: True if app.theme_cls.theme_style == "Dark" else False
+                            on_active: app.nightModeSwicthActive()
+                            #on_state: app.nightModeSwicthState()
+
+                    OneLineAvatarIconListItem:
+                        radius: 13, 13, 13, 13
+                        text: "Help"
+                        #_no_ripple_effect: True
+                        #on_release: root.withdraw_money()
+                        bg_color: app.theme_cls.bg_darkest
+                        divider: None
+                        IconLeftWidgetWithoutTouch:
+                            icon: 'lifebuoy'
+                        IconRightWidgetWithoutTouch:
+                            icon: 'chevron-right'

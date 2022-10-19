@@ -1,5 +1,57 @@
 #:kivy 2.1.0
 
+<Edit_Expenses_layout>
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "400dp"
+    expenseType: expenseType
+    expenseName: expenseName
+    expenseAmount: expenseAmount
+    expenseDate: expenseDate
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                id: bank_mdEdit
+                spacing: "7dp"
+                MDTextField:
+                    id: expenseType
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Expenses type(Fixed, Variable)'
+                    text: ""
+                MDTextField:
+                    id: expenseName
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Expenses Name'
+                    text: ""
+                MDTextField:
+                    id: expenseAmount
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Expenses Amount'
+                    text: ""
+                MDTextField:
+                    id: expenseDate
+                    multiline: False
+                    mode: "fill"
+                    hint_text: 'Expenses Date'
+                    text: ""
+                    validator: "date"
+                    date_format: "dd/mm/yyyy"
+                    date_interval: None, app.ToDay
+                    helper_text: "use dd/mm/yyyy format date"
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
+
 <New_Var_Expense_layout>
 	orientation: "vertical"
 	spacing: "20sp"
@@ -12,7 +64,7 @@
 	ScrollView:
 		smooth_scroll_end: 10
 		MDList:
-			spacing: "5dp"
+			spacing: "15dp"
             MDTextField:
                 id: varExpenseItem
                 multiline: False
@@ -27,7 +79,12 @@
                 id: varExpenseDate
                 multiline: False
                 mode: "rectangle"
-                hint_text: 'Date(dd/mm/yy)'
+                hint_text: 'Expense Date'
+                validator: "date"
+                date_format: "dd/mm/yyyy"
+                date_interval: None, app.ToDay
+                helper_text: "use dd/mm/yyyy format date"
+
             MDRaisedButton:
                 text: 'Save'
                 on_release: root.addNewVarExpense()
@@ -45,7 +102,7 @@
 	ScrollView:
 		smooth_scroll_end: 10
 		MDList:
-			spacing: "5dp"
+			spacing: "15dp"
             MDTextField:
                 id: fExpenseItem
                 multiline: False
@@ -60,7 +117,12 @@
                 id: fExpenseDate
                 multiline: False
                 mode: "rectangle"
-                hint_text: 'Date(dd/mm/yy)'
+                hint_text: 'Expens Date'
+                validator: "date"
+                date_format: "dd/mm/yyyy"
+                date_interval: None, app.ToDay
+                helper_text: "use dd/mm/yyyy format date"
+
             MDRaisedButton:
                 text: 'Save'
                 on_release: root.addNewFExpense()
@@ -75,6 +137,7 @@
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
+    on_release: root.expenseEdit()
     MDBoxLayout:
         orientation: "horizontal"
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -110,7 +173,7 @@ Expneses:
                 widget_position: 'top'
                 title: "Expenses"
                 left_action_items: [["arrow-left", lambda x:app.backHome(), "Back"]]
-                right_action_items: [["tune-variant"]]
+                right_action_items: [["export-variant", lambda x:root.exportExpenses()]]
                 specific_text_color: app.theme_cls.opposite_bg_normal
                 md_bg_color: app.theme_cls.bg_normal
                 elevation: 1

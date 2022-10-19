@@ -2,7 +2,6 @@
 """
 To manage sqlite database
 """
-from ast import Pass
 import sqlite3
 conn = sqlite3.connect('store.db')
 c = conn.cursor()
@@ -89,11 +88,51 @@ def readSomeExpenses():
     expense = c.fetchall()
     return expense
 
+def detailExpenses(id):
+    """
+    To see detail expenses info
+    """
+    c.execute("SELECT * FROM expenses WHERE id=?", (id, ))
+    expense = c.fetchone()
+    return expense
+
+def readSomeFixExpenses():
+    """
+    To only read name, amount and date of Fixed expenses
+    """
+    c.execute("SELECT id, name, amount, date FROM expenses where type = 'Fixed'")
+    expense = c.fetchall()
+    return expense
+
+def readSomeVarExpenses():
+    """
+    To only read name, amount and date of Variable expenses
+    """
+    c.execute("SELECT id, name, amount, date FROM expenses where type = 'Variable'")
+    expense = c.fetchall()
+    return expense
+
+def readExpenses():
+    """
+    To read all expenses data
+    """
+    c.execute("SELECT * FROM expenses")
+    expense = c.fetchall()
+    return expense
+
 def readCustomer():
     """
     read Customer table
     """
     c.execute("SELECT * FROM customers")
+    customers = c.fetchall()
+    return customers
+
+def readSomeCustomer():
+    """
+    read only some values of Customers dataTable
+    """
+    c.execute("SELECT customerId, customerName, companyName, totalPurchase FROM customers")
     customers = c.fetchall()
     return customers
 
@@ -294,6 +333,14 @@ def deleteBankAcc(bId):
     """
     c.execute("DELETE from bankAcc where id = ?", (bId, ))
     conn.commit()
+
+def deleteExpenses(eId):
+    """
+    delete Expenses with id eId
+    """
+    c.execute("DELETE from expenses where id = ?", (eId, ))
+    conn.commit()
+
 
 def closeCursor():
     c.close()

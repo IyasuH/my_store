@@ -130,7 +130,7 @@
 <MDXpense>
     focus_behavior: True
     size_hint: None, None
-    size: '295dp', '50dp'
+    size: '385dp', '50dp'
     pos_hint: {'center_x': .5, 'center_y': .5}
     ripple_behavior: True
     elevation: 4
@@ -145,17 +145,20 @@
         spacing: "5sp"
         MDLabel:
             id: expenseName
-            font_size: '13sp'
+            font_size: '14sp'
+            markup: True
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseName
         MDLabel:
             id: expenseAmount
-            font_size: '13sp'
+            font_size: '14sp'
+            markup: True
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseAmount
         MDLabel:
             id: expenseDate
-            font_size: '13sp'
+            font_size: '13.5sp'
+            markup: True
             pos_hint: {'center_x': .5, 'center_y': .5}
             text: root.expenseDate
 
@@ -175,22 +178,24 @@ Expneses:
                 left_action_items: [["arrow-left", lambda x:app.backHome(), "Back"]]
                 right_action_items: [["export-variant", lambda x:root.exportExpenses()]]
                 specific_text_color: app.theme_cls.opposite_bg_normal
-                md_bg_color: app.theme_cls.bg_normal
+                md_bg_color: app.theme_cls.bg_dark
                 elevation: 1
             ScrollView:
                 do_scroll_x: False
+                do_scroll_y: False
                 smooth_scroll_end: 10
                 MDBoxLayout:
                     orientation: 'vertical'
                     spacing: 7
+                    adaptive_size: True
                     MDCard:
                         #focus_behavior: True
                         size_hint: None, None
-                        size: '310dp', '30dp'
+                        size: '390dp', '30dp'
                         #unfocus_color: app.theme_cls.bg_normal
                         #focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_normal
-                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        pos_hint: {'center_x': .5}
                         elevation: 1
 
                         MDBoxLayout:
@@ -213,7 +218,7 @@ Expneses:
                     MDCard:
                         #focus_behavior: True
                         size_hint: None, None
-                        size: '310dp', '240dp'
+                        size: '390dp', '320dp'
                         unfocus_color: app.theme_cls.bg_normal
                         focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_normal
@@ -231,6 +236,7 @@ Expneses:
                                 pos_hint: {'center_y': .5}
                                 divider_color: app.theme_cls.primary_dark
                                 #size_hint_y: .18
+                                _no_ripple_effect: True
                                 IconRightWidget:
                                     icon: "plus"
                                     icon_size: "30sp"
@@ -238,7 +244,7 @@ Expneses:
                                     icon_color: app.theme_cls.primary_dark
                                     on_release: root.addFixedE()
                             MDGridLayout:
-                                cols: 4
+                                cols: 3
                                 padding: "12sp"
                                 spacing: "7sp"
                                 adaptive_height: True
@@ -248,11 +254,13 @@ Expneses:
                                     color: [167/255, 167/255, 167/255, .7]
                                 MDLabel:
                                     bold: True
-                                    text: 'Amount'
+                                    markup: True
+                                    text: '[color=#ff005a][b]Amount[/color][/b]'
                                     color: [167/255, 167/255, 167/255, .7]
                                 MDLabel:
                                     bold: True
-                                    text: 'Date'
+                                    markup: True
+                                    text: '[color=#02f363][b]Date[/color][/b]'
                                     color: [167/255, 167/255, 167/255, .7]                                    
 
                             ScrollView:
@@ -262,7 +270,7 @@ Expneses:
                                 MDBoxLayout:
                                     id: fixedExpenses
                                     adaptive_size: True
-                                    padding: "10sp"
+                                    padding: "5sp", "10sp", "10sp", "0sp"
                                     spacing: "7sp"
                                     pos_hint: {'center_x': .5, 'center_y': .5}
                                     orientation: 'vertical'
@@ -271,7 +279,7 @@ Expneses:
                     MDCard:
                         #focus_behavior: True
                         size_hint: None, None
-                        size: '310dp', '240dp'
+                        size: '390dp', '320dp'
                         unfocus_color: app.theme_cls.bg_normal
                         focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_normal
@@ -289,6 +297,7 @@ Expneses:
                                 pos_hint: {'center_y': .5}
                                 divider_color: app.theme_cls.primary_dark
                                 #size_hint_y: .18
+                                _no_ripple_effect: True
                                 IconRightWidget:
                                     icon: "plus"
                                     icon_size: "30sp"
@@ -306,11 +315,13 @@ Expneses:
                                     color: [167/255, 167/255, 167/255, .7]
                                 MDLabel:
                                     bold: True
-                                    text: 'Amount'
+                                    markup: True
+                                    text: '[color=#ff005a][b]Amount[/color][/b]'
                                     color: [167/255, 167/255, 167/255, .7]
                                 MDLabel:
                                     bold: True
-                                    text: 'Date'
+                                    markup: True
+                                    text: '[color=#02f363][b]Date[/color][/b]'
                                     color: [167/255, 167/255, 167/255, .7]                                    
                             ScrollView:
                                 do_scroll_x: False
@@ -319,7 +330,7 @@ Expneses:
                                 MDBoxLayout:
                                     id: variableExpenses
                                     adaptive_size: True
-                                    padding: "10sp"
+                                    padding: "5sp", "10sp", "10sp", "0sp"
                                     spacing: "7sp"
                                     pos_hint: {'center_x': .5, 'center_y': .5}
                                     orientation: 'vertical'

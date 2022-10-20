@@ -22,7 +22,7 @@ source.include_exts = py,png,jpg,kv,atlas,db
 #source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = .vscode, __pycache__, bstore-env, .pytest_cache
+source.exclude_dirs = tests, bin, bstore-env, .vscode
 
 # (list) List of exclusions using pattern matching
 # Do not prefix with './'
@@ -37,11 +37,11 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy==2.1.0, docutils, Kivy-Garden, pygments, https://github.com/kivymd/KivyMD/archive/master.zip, pillow, datetime, openpyxl, et-xmlfile, sqlite3
+requirements = python3, kivy==2.1.0, docutils, Kivy-Garden, pygments, kivymd, pillow, datetime, openpyxl, et-xmlfile, sqlite3
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
-# requirements.source.kivy = ./
+# requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/data/presplash.png

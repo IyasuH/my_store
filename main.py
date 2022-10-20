@@ -46,12 +46,28 @@ from kivymd.uix.behaviors import (
     CommonElevationBehavior,
 )
 
-import sqlite3
-conn = sqlite3.connect('store.db')
-c = conn.cursor()
+from plyer import notification
+
+def notify(noti_title, noti_msg):
+	"""
+	this function will be called to handle notifications with title and msg passed as an argument
+		noti_title: notification title
+		noti_msg: notification message
+	Other parametrs also could be added and modified from the default one
+	"""
+	notification.notify(title=noti_title, message=noti_msg, app_name='My Store', app_icon='', timeout=10, ticker='', toast=False)
 
 
-class MDashCard(MDCard, CommonElevationBehavior,):
+# THE NEXT 4 LINES ONLY RUNS ON android device 
+# USED TO CALL FOR LOCAL STORAGE IN ANDROID DEVICE
+import android
+from android.permissions import request_permissions, Permission
+from android.storage import primary_external_storage_path
+request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
+
+primary_ext_storage = primary_external_storage_path()
+
+class MDashCard(MDCard, CommonElevationBehavior):
 	"""
 	cards on the dashboard
 	"""
@@ -1493,8 +1509,10 @@ class Home(MDScreen):
 		"""
 		uploading stock data from XL file
 		"""
-		path = os.path.expanduser("~")
-		self.item_manager.show(path)
+		#app_path = os.path.dirname(os.path.abspath(__file__))
+		#path = os.path.expanduser("~")
+		#androidPath = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'Downloads')
+		self.item_manager.show(primary_ext_storage)
 		self.item_manager_open = True
 	def newStock(self):
 		"""
@@ -1591,7 +1609,6 @@ class Home(MDScreen):
 		for x in allSales:
 			if int(x[4][3:5]) == int(self.monthForSales):
 				monthSales.append(x)
-
 		book = Workbook()
 		sheet = book.active
 		col0 =['Sales Id', 'Item Id', 'Customer Id', 'Item Quantity', 'Sold Date', 'Sales Revenue', 'Bank Id']
@@ -1599,7 +1616,8 @@ class Home(MDScreen):
 		monthSales.insert(0, col0)
 		for sales in monthSales:
 			sheet.append(sales)
-		book.save("{}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
+		#androidPath = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'Downloads')
+		book.save("{}/{}_{}_sales.xlsx".format(primary_ext_storage, self.monthShort, date.today().strftime("%Y")))
 		toast("Your file is saved as {}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 
 	def newSales(self):
@@ -2034,7 +2052,7 @@ class Expneses(MDScreen):
 		monthExpense.insert(0, col0)
 		for expenses in monthExpense:
 			sheet.append(expenses)
-		book.save("{}_{}_expenses.xlsx".format(self.monthShort, date.today().strftime("%Y")))
+		book.save("{}/{}_{}_expenses.xlsx".format(primary_ext_storage, self.monthShort, date.today().strftime("%Y")))
 		toast("Your file is saved as {}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 
 

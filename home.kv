@@ -443,7 +443,7 @@
 <MDSalesCard>
     focus_behavior: True
     size_hint: None, None
-    size: '295dp', '50dp'
+    size: '385dp', '50dp'
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
@@ -460,7 +460,8 @@
         MDLabel:
             id: salesName
             markup: True
-            font_size: '13sp'
+            font_size: '12.5sp'
+            bold: True
             #theme_text_color: "Custom"
             #text_color: [250/255, 115/255, 0]
             pos_hint: {'center_x': .5, 'center_y': .5}
@@ -486,7 +487,7 @@
             id: salesDate
             markup: True
             bold: True
-            font_size: '11sp'
+            font_size: '12sp'
             theme_text_color: "Custom"
             text_color: [162/255, 104/255, 190/255]
             pos_hint: {'center_x': .5, 'center_y': .5}
@@ -524,7 +525,7 @@
 <MDCustomCard>
     focus_behavior: True
     size_hint: None, None
-    size: '310dp', '150dp'
+    size: '390dp', '150dp'
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
@@ -542,7 +543,7 @@
                 radius: [10,10,0,0]
                 md_bg_color: (243/255, 63/255, 63/255, 1)
                 size_hint: None, None
-                size: '310dp', '55dp'
+                size: '390dp', '55dp'
                 MDIconButton:
                     icon: "trash-can"
                     pos_hint: {"center_y": .5}
@@ -555,7 +556,7 @@
                 md_bg_color: app.theme_cls.bg_normal
                 elevation: 3
                 size_hint: None, None
-                size: '310dp', '55dp'
+                size: '390dp', '55dp'
                 MDGridLayout:
                     cols: 3
                     id: customerCompanyName
@@ -639,14 +640,14 @@
 <MDashCard>
     focus_behavior: True
     size_hint: None, None
-    size: '305dp', '105dp'
+    size: '390dp', '105dp'
     #size: root.winSize[0]*.95, '105dp'
     #adaptive_width: True
     #size: self.minimum_size
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
-    elevation: 4
+    elevation: 0
     ripple_behavior: True
     MDRelativeLayout:
         MDLabel:
@@ -676,9 +677,9 @@
             #md_bg_color: 1, 0, 100/255, .1
             CircularProgressBar:
                 size_hint: None, None
-                size: 55, 55
+                size: 97, 97
                 adaptive_size: True
-                pos_hint: {"x": .75, "y": .3}
+                pos_hint: {"x": .75, "y": .25}
                 value: root.cpbValue
                 bar_color: root.cpbBarColor
 
@@ -687,12 +688,12 @@
     focus_behavior: True
     ripple_behavior: True
     size_hint: None, None
-    size: '305dp', '60dp'
+    size: '390dp', '60dp'
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
     pos_hint: {'center_x': .5, 'center_y': .5}
-    elevation: 2
+    elevation: 0
     radius: [0,0,0,0]
     on_release: root.topCustomerDetail()
     MDBoxLayout:
@@ -736,6 +737,7 @@
 <BarChart>
     size_hint: None, None
     adaptive_size: True
+    padding: '10sp'
     canvas.after:
         Color:
             rgba: root.bar_color +[.9]
@@ -745,19 +747,21 @@
             radius: [self.width / 4,]
 
     MDLabel:
+        # number value
         markup: True
         text: root.text
         bold: True
-        font_size: "12sp"
+        font_size: "13sp"
         pos_hint: {"center_x": .5, "y": ((root.set_value/1000)-.4)}
         halign: "center"
         color: root.bar_color
 
     MDLabel:
+        # mon, tues
         text: root.refer
         bold: True
-        font_size: "11sp"
-        pos_hint: {"center_x": .5, "y":-.55}
+        font_size: "14sp"
+        pos_hint: {"center_x": .5, "y":-.57}
         halign: "center"
         color: root.bar_color
 
@@ -786,10 +790,10 @@
 
 Home:
     name: "home"
-    tock_tab: tock_tab.__self__
     customerTab: customerTab
     salesTab: salesTab
     monthDropDownMenuCaller: monthDropDownMenuCaller
+    tock_tab: tock_tab
     cashBank_tab: cashBank_tab
     cashCash_tab: cashCash_tab
     barChartSales: barChartSales
@@ -811,6 +815,7 @@ Home:
                 text: 'Home'
                 icon: 'home-outline'
                 on_tab_press: root.on_enter()
+                md_bg_color: app.theme_cls.bg_darkest
                 MDBoxLayout:
                     orientation: 'vertical'
                     spacing: 20
@@ -820,8 +825,8 @@ Home:
                         left_action_items: [["sort-variant"]]
                         right_action_items: [["tune-variant", lambda x:app.gotoSetting(), "Settings"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
-                        md_bg_color: app.theme_cls.bg_normal
-                        elevation: 1
+                        md_bg_color: app.theme_cls.bg_dark
+                        elevation: 0
                     ScrollView:
                         do_scroll_x: False
                         smooth_scroll_end: 10
@@ -832,16 +837,21 @@ Home:
                             orientation: 'vertical'
                             pos_hint: {"center_x": .5, "center_y": .5}
                             MDLabel:
+                                text: ''
+                            MDLabel:
                                 markup: True
                                 text: 'Hello Bety'
                                 bold: True
-                                font_size: '28sp'
+                                font_size: '29sp'
                             MDLabel:
                                 text: ''    
                             MDLabel:
-                                font_size: '15sp'
-                                text: 'Welcome Back!'
+                                font_size: '16sp'
+                                bold: True
+                                text: 'W e l c o m e  B a c k  !'
                                 color: [167/255, 167/255, 167/255, .5]
+                            MDLabel:
+                                text: ''
                             MDashCard:
                                 id: salesDashBoardCard
                                 focu_color: 1, 0, 100/255, .2
@@ -852,13 +862,17 @@ Home:
                                 updownIcon: 'arrow-top-right'
                                 cpbValue: 0
                                 cpbBarColor: [250/255, 115/255, 0]
-                            MDBoxLayout:
+                            MDCard:
                                 id: barChartSales
-                                size_hint_y: .7
-                                orientation: 'horizontal'
-                                spacing: "13dp"
-                                padding: "7dp"
-                                adaptive_size: True
+                                size_hint: None, None
+                                size: '450dp', '220dp'
+                                md_bg_color: app.theme_cls.bg_darkest
+                                #height: '200dp'
+                                #orientation: 'horizontal'
+                                spacing: "25sp"
+                                padding: "10sp", "0sp", "10sp", "10sp"
+                                #adaptive_height: True
+                                #adaptive_width: True
                             MDashCard:
                                 id: profitDashBoardCard
                                 focu_color: 1, 0, 100/255, .2
@@ -869,13 +883,13 @@ Home:
                                 updownIcon: 'arrow-top-right'
                                 cpbValue: 0
                                 cpbBarColor: [38/255, 255/255, 0]
-                            MDBoxLayout:
+                            MDCard:
                                 id: barChartProfit
-                                size_hint_y: .7
-                                orientation: 'horizontal'
-                                spacing: "13dp"
-                                padding: "7dp"
-                                adaptive_size: True
+                                size_hint: None, None
+                                size: '450dp', '220dp'
+                                md_bg_color: app.theme_cls.bg_darkest
+                                spacing: "25sp"
+                                padding: "10sp", "0sp", "10sp", "10sp"
 
                             MDashCard:
                                 id: customersDashBoardCard
@@ -893,12 +907,12 @@ Home:
                                 MDCard:
                                     #focus_behavior: True
                                     size_hint: None, None
-                                    size: '305dp', '55dp'
+                                    size: '390dp', '55dp'
                                     unfocus_color: app.theme_cls.bg_normal
                                     focus_color: app.theme_cls.bg_dark
                                     md_bg_color: app.theme_cls.bg_normal
                                     pos_hint: {'center_x': .5, 'center_y': .5}
-                                    elevation: 3
+                                    elevation: 0
                                     radius: [10,10,0,0]
                                     MDGridLayout:
                                         cols: 2
@@ -956,6 +970,7 @@ Home:
                 text: 'Stock'
                 #icon: 'chart-box-outline'
                 on_tab_press: root.on_tab_stock()
+                md_bg_color: app.theme_cls.bg_darkest
                 MDBoxLayout:
                     orientation: 'vertical'
                     MDTopAppBar:
@@ -964,12 +979,12 @@ Home:
                         left_action_items: [["attachment", lambda x: root.uploadStockFromFile()]]
                         right_action_items: [["plus", lambda x: root.newStock(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
-                        md_bg_color: app.theme_cls.bg_normal
-                        elevation: 1
+                        md_bg_color: app.theme_cls.bg_dark
+                        elevation: 5
                     MDFloatLayout:
                         id: tock_tab
                         radius: [0,0,0,0]
-                        md_bg_color: app.theme_cls.bg_normal
+                        md_bg_color: app.theme_cls.bg_dark
 
                     
             MDBottomNavigationItem:
@@ -988,8 +1003,8 @@ Home:
                         left_action_items: [["export-variant", lambda x: root.exportSales()]]
                         right_action_items: [["plus", lambda x: root.newSales(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
-                        md_bg_color: app.theme_cls.bg_normal
-                        elevation: 1
+                        md_bg_color: app.theme_cls.bg_dark
+                        elevation: 0
                     ScrollView:
                         do_scroll_x: False
                         do_scroll_y: False
@@ -1002,7 +1017,7 @@ Home:
                             adaptive_size: True
                             MDCard:
                                 size_hint: None, None
-                                size: '310dp', '30dp'
+                                size: '390dp', '30dp'
                                 unfocus_color: app.theme_cls.bg_normal
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
@@ -1030,7 +1045,7 @@ Home:
                             MDCard:
                                 focus_behavior: False
                                 size_hint: None, None
-                                size: '310dp', '420dp'
+                                size: '400dp', '650dp'
                                 unfocus_color: app.theme_cls.bg_normal
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
@@ -1044,7 +1059,7 @@ Home:
                                         MDCard:
                                             #focus_behavior: True
                                             size_hint: None, None
-                                            size: '305dp', '50dp'
+                                            size: '390dp', '50dp'
                                             unfocus_color: app.theme_cls.bg_normal
                                             focus_color: app.theme_cls.bg_dark
                                             md_bg_color: app.theme_cls.bg_normal
@@ -1079,7 +1094,7 @@ Home:
                                             MDBoxLayout:
                                                 id: salesTab
                                                 adaptive_size: True
-                                                padding: "10sp"
+                                                padding: "0sp", "10sp", "0sp", "0sp"
                                                 spacing: "7sp"
                                                 pos_hint: {'center_x': .5, 'center_y': .5}
                                                 orientation: 'vertical'
@@ -1096,10 +1111,10 @@ Home:
                     MDTopAppBar:
                         widget_position: 'top'
                         title: "Cash"
-                        left_action_items: [["sort-variant"]]
+                        left_action_items: [["refresh",lambda x: root.on_tab_cash()]]
                         right_action_items: [["plus"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
-                        md_bg_color: app.theme_cls.bg_darkest
+                        md_bg_color: app.theme_cls.bg_dark
                         elevation: 1
                     MDBoxLayout:
                         orientation: 'vertical'
@@ -1134,6 +1149,7 @@ Home:
                 text: 'Customer'
                 icon: 'account-multiple-outline'
                 on_tab_press: root.on_tab_customer()
+                md_bg_color: app.theme_cls.bg_darkest
                 MDBoxLayout:
                     orientation: 'vertical'
                     MDTopAppBar:
@@ -1142,7 +1158,7 @@ Home:
                         left_action_items: [["attachment", lambda x: root.uploadCustomerFromFile()], ["refresh", lambda x: root.reFresh(), "Refresh"]]
                         right_action_items: [["plus", lambda x: root.newCustomer(), "Add"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
-                        md_bg_color: app.theme_cls.bg_normal
+                        md_bg_color: app.theme_cls.bg_dark
                         elevation: 1
                     ScrollView:
                         do_scroll_x: False

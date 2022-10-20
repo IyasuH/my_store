@@ -26,7 +26,7 @@ from kivy.core.window import Window
 import os
 from operator import itemgetter
 from openpyxl import Workbook
-#import database
+import database
 import openpyxl
 from openpyxl import load_workbook
 from kivy.properties import ListProperty, NumericProperty, StringProperty, ObjectProperty
@@ -40,344 +40,18 @@ from kivymd.uix.behaviors import HoverBehavior
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import IRightBodyTouch
 
+from kivymd.uix.behaviors import (
+    RectangularRippleBehavior,
+    BackgroundColorBehavior,
+    CommonElevationBehavior,
+)
+
 import sqlite3
 conn = sqlite3.connect('store.db')
 c = conn.cursor()
 
 
-class database:
-	def insertBankAcc(bName, bAmount, bCreated_at, bUpdated_at):
-		"""
-		insert for bankAccount tables
-		"""
-		c.execute("insert into bankAcc(bankName, amount, created_at, updated_at) values(?, ?, ?, ?)", (bName, bAmount, bCreated_at, bUpdated_at))
-		conn.commit()
-
-	def insertXpense(eType, eName, eAmount, eDate):
-		"""
-		insert function for expense table
-		"""
-		c.execute("insert into expenses(type, name, amount, date) values(?, ?, ?, ?)", (eType, eName, eAmount, eDate))
-		conn.commit()
-
-	def insertCustomer(cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
-		"""
-		insert function for customers table
-		"""
-		c.execute("insert into customers (customerName, companyName, customerTinNumber, customerCity, customerPhoneN, accountCreatedDate, frequencyOfPurchase, totalPurchase, bankAccountNumber) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", (cName, compName, int(cTinNumber), custCity, int(cPhoneNumber), createdDate, int(frequencyPurcases), int(totPurchases), int(bankAcc)))
-		conn.commit()
-		print('data inserted successfully')
-
-	def insertItem(iName, iQuantity, purchasedDate, priceCherecharo, priceBulk):
-		"""
-		insert function for Item table
-		"""
-		# initaly updateAt == purchaseDate 
-		# so no need to accept updateAt argument
-		c.execute("INSERT INTO inventory (itemName, itemQuantity, purchasedDate, sellingPriceCherecharo, sellingPriceBulk, updatedAt) VALUES(?, ?, ?, ?, ?, ?)", (iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, purchasedDate))
-		print('data inserted successfully')
-		conn.commit()
-
-	def insertSales(itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId):
-		"""
-		insert function for sales table
-		"""
-		c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, salesRevenue, bankId) VALUES(?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId))
-		conn.commit()
-
-	# read
-	def readBankAcc():
-		"""
-		to read bankAcc
-		"""
-		c.execute("SELECT * FROM bankAcc")
-		banks = c.fetchall()
-		return banks
-
-	def detailBankAcc(bankName):
-		"""
-		detail bankAcc using bank name
-		"""
-		c.execute("SELECT * FROM bankAcc WHERE bankName=?", (bankName,))
-		bank = c.fetchone()
-		return bank
-
-	def detailBankAccId(bankId):
-		"""
-		detail bank using bank id
-		"""
-		c.execute("SELECT * FROM bankAcc WHERE id=?", (bankId,))
-		bank = c.fetchone()
-		return bank
-
-
-	def readSomeExpenses():
-		"""
-		To only read name, amount and date of expenses
-		"""
-		c.execute("SELECT type, name, amount, date FROM expenses")
-		expense = c.fetchall()
-		return expense
-
-	def detailExpenses(id):
-		"""
-		To see detail expenses info
-		"""
-		c.execute("SELECT * FROM expenses WHERE id=?", (id, ))
-		expense = c.fetchone()
-		return expense
-
-	def readSomeFixExpenses():
-		"""
-		To only read name, amount and date of Fixed expenses
-		"""
-		c.execute("SELECT id, name, amount, date FROM expenses where type = 'Fixed'")
-		expense = c.fetchall()
-		return expense
-
-	def readSomeVarExpenses():
-		"""
-		To only read name, amount and date of Variable expenses
-		"""
-		c.execute("SELECT id, name, amount, date FROM expenses where type = 'Variable'")
-		expense = c.fetchall()
-		return expense
-
-	def readExpenses():
-		"""
-		To read all expenses data
-		"""
-		c.execute("SELECT * FROM expenses")
-		expense = c.fetchall()
-		return expense
-
-	def readCustomer():
-		"""
-		read Customer table
-		"""
-		c.execute("SELECT * FROM customers")
-		customers = c.fetchall()
-		return customers
-
-	def readSomeCustomer():
-		"""
-		read only some values of Customers dataTable
-		"""
-		c.execute("SELECT customerId, customerName, companyName, totalPurchase FROM customers")
-		customers = c.fetchall()
-		return customers
-
-	def detailCustomer(CID):
-		"""
-		retrive all the information from database
-		"""
-		c.execute("SELECT * FROM customers where customerId=?", (CID, ))
-		customer = c.fetchone()
-		return customer
-
-	def readSCustomer():
-		"""
-		selecting only specific columns
-		"""
-		c.execute("SELECT customerId, customerName, companyName, customerCity, customerPhoneN, customerTinNumber, totalPurchase FROM customers")
-		customers = c.fetchall()
-		return customers
-
-	def readItem():
-		"""
-		read Item table
-		"""
-		c.execute("SELECT * FROM inventory")
-		Items = c.fetchall()
-		return Items
-
-	def detailItem(CID):
-		"""
-		retrive all the information from database
-		"""
-		c.execute("SELECT * FROM inventory where itemId= ?", (int(CID),))
-		customer = c.fetchone()
-		return customer
-
-
-	def readSItem():
-		"""
-		selecting only specific columns
-		"""
-		c.execute("SELECT itemId, itemName, itemQuantity, sellingPriceCherecharo FROM inventory")
-		items = c.fetchall()
-		cToList = []
-		for x in items:
-			cToList.append(list(x))
-		#for x in cToList:
-			#if x[2] < 
-		return cToList
-
-	def readSomeSales():
-		"""
-		some amount of sales
-		"""
-		c.execute("SELECT itemId, itemQuantitiy, salesRevenue, soldDate, salesId FROM sales")
-		sales = c.fetchall()
-		cToList = []
-		for x in sales:
-			cToList.append(list(x))
-		return cToList
-
-	def readCashSales():
-		"""
-		sales info for cash
-		"""
-		c.execute("SELECT soldDate, salesRevenue, bankId, salesId FROM sales")
-		cash = c.fetchall()
-		cToList = []
-		for x in cash:
-			cToList.append(list(x))
-		return cToList
-
-	def readSales():
-		"""
-		read Sales table
-		"""
-		c.execute("SELECT * FROM sales")
-		sales = c.fetchall()
-		return sales
-
-	def detailSales(SID):
-		"""
-		retrive all the information from database
-		"""
-		c.execute("SELECT * FROM sales where salesId= ?", (SID,))
-		sales = c.fetchone()
-		return sales
-
-
-	def readCustomerSales(Id):
-		"""
-		sales made by specific customer
-		"""
-		c.execute("SELECT * FROM sales where customerId = ?", (Id, ))
-		customerSales = c.fetchall()
-		return customerSales
-
-	# update
-	def updateCustomer(cId, cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
-		"""
-		updates customer database
-		"""
-		c.execute("UPDATE customers SET customerName = ?, companyName = ?, customerTinNumber = ?, customerCity = ?, customerPhoneN = ?, accountCreatedDate = ?, frequencyOfPurchase = ?, totalPurchase = ?, bankAccountNumber = ? WHERE customerId = ?", (cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, int(frequencyPurcases), int(totPurchases), int(bankAcc), cId))
-		conn.commit()
-
-	def updateBankIdINSalesC(salesId, bankId):
-		"""
-		change bankId in sales table from cash 12 to bankCID
-			here first argument is salesId
-			second argument is bankId it changed to 
-		"""
-		c.execute("UPDATE sales SET bankId = ? WHERE salesId = ?", (bankId, salesId))
-		conn.commit()
-
-	def getBankAmount(self, bankId):
-		"""
-		Just to get Amount for whatever bank
-		"""
-		c.execute("SELECT amount FROM bankAcc WHERE id = ?", (bankId, ))
-		amount = c.fetchone()
-		return amount
-
-	def updateBankAmountC(self, sRevenu, bankId, cashId):
-		"""
-		And here update bankAcc revenue
-			# subtract from Cash (the revenue)And
-			# Add the to given bank 
-		"""
-		cashRevenu = self.getBankAmount(cashId)[0] - int(sRevenu)
-		bankRevenu = self.getBankAmount(bankId)[0] + int(sRevenu)
-		c.execute("UPDATE bankAcc SET amount = ? WHERE id = ?", (cashRevenu, cashId))
-		c.execute("UPDATE bankAcc SET amount = ? WHERE id = ?", (bankRevenu, bankId))
-		conn.commit()
-
-	def updateItem(iId, iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, updateAt):
-		"""
-		update item database
-		"""
-		c.execute("UPDATE inventory SET itemName = ?, itemQuantity = ?, purchasedDate = ?, sellingPriceCherecharo = ?, sellingPriceBulk = ?, updatedAt = ? WHERE itemID = ?", (iName, iQuantity, purchasedDate, priceCherecharo, priceBulk, updateAt, iId))
-		conn.commit()
-
-	def updateSales(sId, itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId):
-		"""
-		update sales database
-		"""
-		c.execute("UPDATE sales SET itemId = ?, customerId = ?, itemQuantitiy = ?, soldDate = ?, salesRevenue = ?, bankId = ? WHERE salesId = ?", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId, sId))
-		conn.commit()
-
-	def updateExpenses(eId, eType, eName, eAmount, eDate):
-		"""
-		update expenses database
-		"""
-		c.execute("UPDATE expenses SET type = ?, name = ?, amount = ?, date = ? WHERE id = ?", (eType, eName, eAmount, eDate, eId))
-		conn.commit()
-
-	def updateBankAcc(bId, bName, bAmount, bCreated_at, bUpdated_at):
-		"""
-		update bankAcc
-		"""
-		c.execute("UPDATE bankAcc SET bankName = ?, amount = ?, created_at = ?, updated_at = ? WHERE id = ?", (bName, bAmount, bCreated_at, bUpdated_at, bId))
-		conn.commit()
-
-	# delete
-	def deleteCustomer(cId):
-		"""
-		deleteCustomer row with id cId
-		"""
-		c.execute("DELETE from customers where customerId = ?", (cId, ))
-		print("Deleted")
-		conn.commit()
-
-
-	def deleteItem(iId):
-		"""
-		deleteItem row with id iId
-		"""
-		c.execute("DELETE from inventory where itemId = ?", (iId, ))
-		print("Deleted")
-		conn.commit()
-
-	def deleteSales(sId):
-		"""
-		deleteSales row with id sId
-		"""
-		c.execute("DELETE from sales where salesId = ?", (sId, ))
-		print("Deleted")
-		conn.commit()
-
-	def deleteExpenses(eId):
-		"""
-		delete Expenses with id eId
-		"""
-		c.execute("DELETE from expenses where id = ?", (eId, ))
-		conn.commit()
-
-	def deleteBankAcc(bId):
-		"""
-		delete bankAcc with id bId
-		"""
-		c.execute("DELETE from bankAcc where id = ?", (bId, ))
-		conn.commit()
-
-	def deleteExpenses(eId):
-		"""
-		delete Expenses with id eId
-		"""
-		c.execute("DELETE from expenses where id = ?", (eId, ))
-		conn.commit()
-
-
-	def closeCursor():
-		c.close()
-
-
-class MDashCard(MDCard):
+class MDashCard(MDCard, CommonElevationBehavior,):
 	"""
 	cards on the dashboard
 	"""
@@ -728,7 +402,7 @@ class CircularProgressBar(AnchorLayout):
 	Circular progressbar
 	"""
 	bar_color = ListProperty([1, 1, 1])
-	bar_width = NumericProperty(2.5)
+	bar_width = NumericProperty(3.7)
 	# where this value is the percent for the progress bar
 	set_value = NumericProperty(0)
 	text = StringProperty("0%")
@@ -1368,6 +1042,11 @@ class Home(MDScreen):
 		#profit_weekly_data = [[230, "Sun"], [843, "Mon"], [593, "Tue"], [744, "Wed"], [999, "Thu"], [726, "Fri"], [979, "Sat"]]
 		#monthly_data = [] # for each week total of 4
 		#yearly_data = [] # for each month total of 12
+		#self.salesDashBoardCard.elevation = 0
+		#self.salesDashBoardCard.elevation = 4
+		#self.profitDashBoardCard.elevation = 0
+		#self.customersDashBoardCard.elevation = 4
+		#self.expensesDashBoardCard.elevation = 4
 		self.barChartSales.clear_widgets()
 		self.barChartProfit.clear_widgets()
 		self.topClientsList.clear_widgets()
@@ -1565,7 +1244,7 @@ class Home(MDScreen):
 			value = x[0],
 			refer = x[1],
 			pos_hint={'center_x': .5, 'center_y': .5},
-			size = (30, 140),
+			size = (57, 140),
 			bar_color=[250/255, 115/255, 0]
 		))for x in sales_weekly_data]
 
@@ -1574,7 +1253,7 @@ class Home(MDScreen):
 			value = x[0],
 			refer = x[1],
 			pos_hint={'center_x': .5, 'center_y': .5},
-			size = (30, 140),
+			size = (57, 140),
 			bar_color=[38/255, 255/255, 0]
 		))for x in profit_weekly_data]
 
@@ -1601,16 +1280,21 @@ class Home(MDScreen):
 			# and on the if condition first 
 		while i < len(itemList):
 			if itemList[i][2] > 10:
-				ava = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "[size={}]".format(12)+itemList[i][1]+"[/size]")
+				ava = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
 			elif itemList[i][2] > 0:
-				ava = ("alert", [255/256, 165/256, 0, 1], "[size={}]".format(12)+itemList[i][1]+"[/size]")
+				ava = ("alert", [255/256, 165/256, 0, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
 			else:
-				ava = ("alert-circle", [1, 0, 0, 1], "[size={}]".format(12)+itemList[i][1]+"[/size]")
+				ava = ("alert-circle", [1, 0, 0, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
 			itemList[i].append(float(itemList[i][2])*float(itemList[i][3]))
 			itemList[i][0] = str(itemList[i][0])
-			itemList[i][2] = "[size={}][color=#f3781b][b]".format(12)+str(itemList[i][2])+"[/b][/color][/size]"
-			itemList[i][3] = "[size={}][color=#6d64de][b]".format(14)+str(itemList[i][3])+"[/b][/color][/size]"
-			itemList[i][4] = "[size={}][color=#02f363][b]".format(14)+str(itemList[i][4])+"[/b][/color][/size]"
+			# itemList[i][2] = "[size={}][color=#f3781b][b]".format(15)+str(itemList[i][2])+"[/b][/color][/size]"
+			# itemList[i][3] = "[size={}][color=#6d64de][b]".format(15)+str(itemList[i][3])+"[/b][/color][/size]"
+			# itemList[i][4] = "[size={}][color=#02f363][b]".format(15)+str(itemList[i][4])+"[/b][/color][/size]"
+
+			itemList[i][2] = "[color=#f3781b][b]"+str(itemList[i][2])+"[/b][/color]"
+			itemList[i][3] = "[color=#6d64de][b]$ "+str(itemList[i][3])+"[/b][/color]"
+			itemList[i][4] = "[color=#02f363][b]$ "+str(itemList[i][4])+"[/b][/color]"
+
 			itemList[i][1] = ava
 			i += 1
 
@@ -1624,13 +1308,21 @@ class Home(MDScreen):
 			#background_color_header="#1cca6d",
 			#background_color_cell="#62eaa1",
 			padding=0,
+			# column_data=[
+			# 	("[size={}][color=#a7a7a7b3][b]ID[/b][/color][/size]".format('16sp'), dp(8)),
+			# 	("[size={}][color=#a7a7a7b3][b]Name[/b][/color][/size]".format(16), dp(28)),
+			# 	("[size={}][color=#f3781b][b]Qty[/b][/color][/size]".format(16), dp(10)),
+			# 	("[size={}][color=#6d64de][b]Price[/b][/color][/size]".format(16), dp(15)),
+			# 	("[size={}][color=#02f363][b]Total[/b][/color][/size]".format(16), dp(15))],
+			# row_data=itemList,)
 			column_data=[
-				("[size={}][color=#a7a7a7b3][b]ID[/b][/color][/size]".format(14), dp(7)),
-				("[size={}][color=#a7a7a7b3][b]Name[/b][/color][/size]".format(14), dp(20)),
-				("[size={}][color=#f3781b][b]Qty[/b][/color][/size]".format(14), dp(8)),
-				("[size={}][color=#6d64de][b]Price[/b][/color][/size]".format(14), dp(11)),
-				("[size={}][color=#02f363][b]Total[/b][/color][/size]".format(14), dp(11))],
+				("[color=#a7a7a7b3][b]ID[/b][/color]", dp(8)),
+				("[color=#a7a7a7b3][b]Name[/b][/color]", dp(25)),
+				("[color=#f3781b][b]Qty[/b][/color]", dp(10)),
+				("[color=#6d64de][b]Price[/b][/color]", dp(17)),
+				("[color=#02f363][b]Total[/b][/color]", dp(20))],
 			row_data=itemList,)
+
 		self.stock_tables.bind(on_row_press=self.item_row_selected)
 
 		self.tock_tab.add_widget(self.stock_tables)
@@ -1868,7 +1560,7 @@ class Home(MDScreen):
 			salesId = str(x[4]),
 			salesName = str(x[0]),
 			salesQty = str(x[1]),
-			salesAmount = "$"+str(x[2]),
+			salesAmount = "$ "+str(x[2]),
 			salesDate = str(x[3])
 		))for x in monthSales]
 
@@ -1910,7 +1602,6 @@ class Home(MDScreen):
 		book.save("{}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 		toast("Your file is saved as {}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 
-
 	def newSales(self):
 		"""
 		Adding new single sales to database
@@ -1950,19 +1641,21 @@ class Home(MDScreen):
 		bank=[]
 		for x in allSales:
 			if x[2] == 12:
-				x[0] = "[size=13]"+x[0]+"[/size]"
+				x[0] = "[color=#02f363][b]"+x[0]+"[/b][/color]"
 				x[2] = str(x[2])
 				x[3] = str(x[3])
 				cash.append(x)
 			else:
-				x[0] = "[size=13]"+x[0]+"[/size]"
+				#x[1] = "[color=#f3781b][b]"+str(x[1])+"[/b][/color]"
+				x[0] = "[color=#02f363][b]"+x[0]+"[/b][/color]"
 				bank.append(x)
 		for x in bank:
 			bankName = database.detailBankAccId(x[2])
 			x.insert(1, bankName[1])
-			x[1] = "[size=14]"+str(x[1])+"[/size]"
-			x[3] = "[size={}]".format(namSize)+str(x[3])+"[/size]"
-			x[4] = "[size={}]".format(namSize)+str(x[4])+"[/size]"
+			x[1] = "[color=#f3781b][b]"+str(x[1])+"[/b][/color]"
+			x[2] = "[color=#6d64de][b]$ "+str(x[2])+"[/b][/color]"
+			x[3] = "[size=17][color=#a7a7a7b3]"+str(x[3])+"[/color][/size]"
+			x[4] = "[size=17][color=#a7a7a7b3]"+str(x[4])+"[/color][/size]"
 
 		self.cashBank_tables = MDDataTable(
 			pos_hint={'center_x': 0.5, 'center_y': .5},
@@ -1971,11 +1664,11 @@ class Home(MDScreen):
 			elevation=3,
 			padding=0,
 			column_data=[
-				("Date", dp(18)),
-				("Bank", dp(14)),
-				("Amount", dp(13)),
-				("[size=14]BId[/size]", dp(5)),
-				("[size=14]SId[/size]", dp(5))],
+				("[color=#02f363]Date[/color]", dp(20)),
+				("[color=#f3781b][b]Bank[/b][/color]", dp(20)),
+				("[color=#6d64de][b]Amount[/b][/color]", dp(14)),
+				("[color=#a7a7a7b3][size=17]BId[/size][/color]", dp(8)),
+				("[color=#a7a7a7b3][size=17]SId[/size][/color]", dp(8))],
 			row_data=bank,)
 		#self.stock_tables.bind(on_row_press=self.item_row_selected)
 
@@ -1986,10 +1679,10 @@ class Home(MDScreen):
 			check=True,
 			padding=0,
 			column_data=[
-				("[size=14]Date[/size]", dp(25)),
-				("Amount", dp(13)),
-				("[size=14]BId[/size]", dp(5)),
-				("[size=14]SId[/size]", dp(5))],
+				("[color=#02f363]Date[/color]", dp(35)),
+				("[color=#6d64de][b]Amount[/b][/color]", dp(20)),
+				("[color=#a7a7a7b3][size=18]BId[/size][/color]", dp(8)),
+				("[color=#a7a7a7b3][size=18]SId[/size][/color]", dp(8))],
 			row_data=cash,)
 		self.cashCash_tables.bind(on_check_press=self.cashCash_check_press)
 		#self.cashCash_tables.bind(get_row_check=self.printCashChecks)
@@ -2259,16 +1952,16 @@ class Expneses(MDScreen):
 
 		[self.fixedExpenses.add_widget(MDXpense(
 			expenseId = x[0],
-			expenseName = str(x[1]),
-			expenseAmount = str(x[2]),
-			expenseDate = str(x[3])
+			expenseName = "[color=#a7a7a7b3][b]"+str(x[1])+"[/color][/b]",
+			expenseAmount = "[color=#ff005a][b]$ "+str(x[2])+"[/color][/b]",
+			expenseDate = "[color=#02f363][b]"+str(x[3])+"[/color][/b]"
 		))for x in monthFixed]
 
 		[self.variableExpenses.add_widget(MDXpense(
 			expenseId = x[0],
-			expenseName = str(x[1]),
-			expenseAmount = str(x[2]),
-			expenseDate = str(x[3])
+			expenseName = "[color=#a7a7a7b3][b]"+str(x[1])+"[/color][/b]",
+			expenseAmount = "[color=#ff005a][b]$ "+str(x[2])+"[/color][/b]",
+			expenseDate = "[color=#02f363][b]"+str(x[3])+"[/color][/b]"
 		))for x in monthVariable]
 		##################
 

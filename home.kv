@@ -440,17 +440,84 @@
                 text: 'Save'
                 on_release: root.addNewItem()
 
-<MDSalesCard>
+<MDItemCard>
     focus_behavior: True
     size_hint: None, None
-    size: '385dp', '50dp'
+    size: '407dp', '50dp'
     unfocus_color: app.theme_cls.bg_normal
     focus_color: app.theme_cls.bg_dark
     md_bg_color: app.theme_cls.bg_normal
     pos_hint: {'center_x': .5, 'center_y': .5}
     ripple_behavior: True
     elevation: 4
-    on_press: root.sales_detail(root.salesId)
+    on_release: root.item_detail(root.itemId)
+    padding: [0,0,5,0]
+    # MDBoxLayout:
+    #     orientation: "horizontal"
+    #     pos_hint: {'center_x': .5, 'center_y': .5}
+    #     padding: 10
+    #     spacing: "5sp"
+    MDGridLayout:
+        cols: 5
+        padding: 10
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        spacing: "5sp"
+        adaptive_height: True
+        MDIconButton:
+            icon: root.itemAIcon
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            valign: 'center'
+            theme_icon_color: "Custom"
+            icon_color: root.itemAIconColor
+            #icon_size: 
+        MDLabel:
+            id: itemName
+            markup: True
+            font_size: '12.5sp'
+            bold: True
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.itemName
+        MDLabel:
+            id: itemQty
+            markup: True
+            font_size: '14sp'
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.itemQty
+        MDLabel:
+            id: itemPrice
+            markup: True
+            font_size: '14sp'
+            theme_text_color: "Custom"
+            bold: True
+            valign: 'center'
+            text_color: [250/255, 115/255, 0]
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.itemPrice
+        MDLabel:
+            id: total
+            markup: True
+            bold: True
+            font_size: '12sp'
+            valign: 'center'
+            theme_text_color: "Custom"
+            text_color: [162/255, 104/255, 190/255]
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.total
+
+
+<MDSalesCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '407dp', '50dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    ripple_behavior: True
+    elevation: 4
+    on_release: root.sales_detail(root.salesId)
     padding: [0,0,5,0]
     MDBoxLayout:
         orientation: "horizontal"
@@ -803,6 +870,8 @@ Home:
     profitDashBoardCard: profitDashBoardCard
     customersDashBoardCard: customersDashBoardCard
     expensesDashBoardCard: expensesDashBoardCard
+    totalStockAmount: totalStockAmount
+    totalSalesAmount: totalSalesAmount
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
@@ -981,10 +1050,108 @@ Home:
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_dark
                         elevation: 5
-                    MDFloatLayout:
-                        id: tock_tab
-                        radius: [0,0,0,0]
-                        md_bg_color: app.theme_cls.bg_dark
+                    ScrollView:
+                        #do_scroll_x: False
+                        smooth_scroll_end: 15
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            spacing: 0
+                            padding: 8
+                            pos_hint: {'center_x': .5, 'center_y': .5}
+                            adaptive_size: True
+                            MDCard:
+                                size_hint: None, None
+                                size: '400dp', '30dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                elevation: 1
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'T o t a l  S t o c k :'
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '18sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalStockAmount
+                                        text: ''
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        halign: 'right'
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                            MDCard:
+                                focus_behavior: False
+                                size_hint: None, None
+                                size: '410dp', '650dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_darkest
+                                pos_hint: {'center_x': .5}
+                                elevation: 3
+                                #ripple_behavior: True
+                                MDFloatLayout:
+                                    MDBoxLayout:
+                                        orientation: "vertical"
+                                        pos_hint: {'center_x': .5, 'center_y': .5}
+                                        MDCard:
+                                            #focus_behavior: True
+                                            size_hint: None, None
+                                            size: '410dp', '50dp'
+                                            unfocus_color: app.theme_cls.bg_normal
+                                            focus_color: app.theme_cls.bg_dark
+                                            md_bg_color: app.theme_cls.bg_normal
+                                            pos_hint: {'center_x': .5, 'center_y': .5}
+                                            elevation: 3
+                                            radius: [10,10,0,0]
+                                            MDGridLayout:
+                                                cols: 5
+                                                padding: "12sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                adaptive_height: True
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Ava'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Name'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Qty'
+                                                    color: [243/255, 120/255, 27/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Price'
+                                                    color: [109/255, 100/255, 222/255, .8]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Total'
+                                                    color: [2/255, 243/255, 99/255, .8]
+                                        ScrollView:
+                                            do_scroll_x: False
+                                            do_scroll_y: False
+                                            smooth_scroll_end: 30
+                                            size_hint_y: .8
+                                            MDBoxLayout:
+                                                id: tock_tab
+                                                adaptive_size: True
+                                                padding: "0sp", "10sp", "0sp", "0sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                orientation: 'vertical'
+
+                    # MDFloatLayout:
+                    #     id: tock_tab
+                    #     radius: [0,0,0,0]
+                    #     md_bg_color: app.theme_cls.bg_dark
 
                     
             MDBottomNavigationItem:
@@ -995,6 +1162,7 @@ Home:
                 on_tab_press: root.on_tab_sales()
                 MDBoxLayout:
                     orientation: 'vertical'
+                    md_bg_color: app.theme_cls.bg_darkest
                     MDTopAppBar:
                         widget_position: 'top'
                         title: "Sales"
@@ -1007,17 +1175,17 @@ Home:
                         elevation: 0
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: False
-                        smooth_scroll_end: 10
+                        #do_scroll_y: False
+                        smooth_scroll_end: 15
                         MDBoxLayout:
                             orientation: 'vertical'
                             spacing: 0
                             padding: 8
                             pos_hint: {'center_x': .5, 'center_y': .5}
-                            adaptive_size: True
+                            adaptive_size: True                            
                             MDCard:
                                 size_hint: None, None
-                                size: '390dp', '30dp'
+                                size: '400dp', '30dp'
                                 unfocus_color: app.theme_cls.bg_normal
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
@@ -1025,6 +1193,7 @@ Home:
                                 elevation: 1
                                 MDBoxLayout:
                                     orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
                                     MDLabel:
                                         id: monthDropDownMenuCaller
                                         text: ''
@@ -1043,12 +1212,39 @@ Home:
                                         pos_hint: {'center_y': .5, 'x': .8}
                                         on_release: root.main_monthMenu.open()
                             MDCard:
-                                focus_behavior: False
                                 size_hint: None, None
-                                size: '400dp', '650dp'
+                                size: '400dp', '30dp'
                                 unfocus_color: app.theme_cls.bg_normal
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                elevation: 1
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'T o t a l  S a l e s :'
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '18sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalSalesAmount
+                                        text: ''
+                                        halign: 'right'
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+
+                            MDCard:
+                                focus_behavior: False
+                                size_hint: None, None
+                                size: '410dp', '650dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_darkest
                                 pos_hint: {'center_x': .5}
                                 elevation: 3
                                 #ripple_behavior: True
@@ -1059,7 +1255,7 @@ Home:
                                         MDCard:
                                             #focus_behavior: True
                                             size_hint: None, None
-                                            size: '390dp', '50dp'
+                                            size: '410dp', '50dp'
                                             unfocus_color: app.theme_cls.bg_normal
                                             focus_color: app.theme_cls.bg_dark
                                             md_bg_color: app.theme_cls.bg_normal
@@ -1070,6 +1266,7 @@ Home:
                                                 cols: 4
                                                 padding: "12sp"
                                                 spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
                                                 adaptive_height: True
                                                 MDLabel:
                                                     bold: True
@@ -1089,7 +1286,8 @@ Home:
                                                     color: [162/255, 104/255, 190/255, .8]
                                         ScrollView:
                                             do_scroll_x: False
-                                            smooth_scroll_end: 10
+                                            do_scroll_y: False
+                                            smooth_scroll_end: 30
                                             size_hint_y: .8
                                             MDBoxLayout:
                                                 id: salesTab

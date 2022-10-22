@@ -7,9 +7,11 @@ conn = sqlite3.connect('store.db')
 c = conn.cursor()
 def createTables():
     # DON'T USE THIS QUERY SINCE THERE IS A LOT OF CHANGES
-    #c.execute("CREATE TABLE if not exists customers(customerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, customerName TEXT NOT NULL, customerTinNumber INT NOT NULL, customerRegion TEXT NOT NULL, customerSubcity TEXT NOT NULL, customerWereda INT NOT NULL, customerPhoneN INT NOT NULL, accountCreatedDate TEXT NOT NULL, frequencyOfPurchase INT NOT NULL, totalPurchase INT NOT NULL, bankAccountNumber INT NOT NULL)")
-    #c.execute("CREATE TABLE if not exists inventory(itemId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemName TEXT NOT NULL, itemQuantity INT NOT NULL, purchasedPrice REAL NOT NULL, purchasedDate TEXT NOT NULL, sellingPriceCherecharo REAL NOT NULL, sellingPriceBulk REAL NOT NULL, updatedAt TEXT NOT NULL)")
-    #c.execute("CREATE TABLE if not exists sales(salesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemId INT NOT NULL, customerId INT NOT NULL, itemQuantitiy INT NOT NULL, soldDate TETX NOT NULL, wayOfPayment TEXT NOT NULL, salesRevenue INT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists customers(customerId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, customerName TEXT NOT NULL, companyName TEXT, customerTinNumber INT NOT NULL, customerCity TEXT NOT NULL, customerPhoneN INT NOT NULL, accountCreatedDate TEXT NOT NULL, frequencyOfPurchase INT NOT NULL, totalPurchase INT NOT NULL, bankAccountNumber INT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists inventory(itemId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemName TEXT NOT NULL, itemQuantity INT NOT NULL, purchasedDate TEXT NOT NULL, sellingPriceCherecharo REAL NOT NULL, sellingPriceBulk REAL NOT NULL, updatedAt TEXT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists bankAcc(id INTEGER PRIMARY KEY AUTOINCREMENT, bankName TEXT NOT NULL, amount int not null, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)")
+    #c.execute("CREATE TABLE if not exists expenses(id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT NOT NULL, name TEXT NOT NULL, amount int not null, date TEXT NOT NULL)")
+    #c.execute("CREATE TABLE sales(salesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, itemId INT NOT NULL, customerId INT NOT NULL, itemQuantitiy INT NOT NULL, soldDate TEXT NOT NULL, salesRevenue INT NOT NULL, bankId INT NOT NULL, add_info TEXT)")
     pass
 
 # here performing basic CRUD
@@ -341,6 +343,48 @@ def deleteExpenses(eId):
     c.execute("DELETE from expenses where id = ?", (eId, ))
     conn.commit()
 
+def backUpdatabase(location='/../../..'):
+    """
+    This function is to backUp data from database save it as db and excel file
+        requires location as an argument to be saved on
+    """
+    sqliteCon = sqlite3.connect('store.db')
+    # new one
+    backupCon = sqlite3.connect("{}/backUp.db".format(location))
+    with backupCon:
+        sqliteCon.backup(backupCon)
+
+    if backupCon:
+        backupCon.close()
+        sqliteCon.close()
+
+    # try:
+    #     # existing DB
+    #     sqliteCon = sqlite3.connect('store.db')
+    #     # new one
+    #     backupCon = sqlite3.connect('{}/backUp.db'.format(location))
+    #     with backupCon:
+    #         sqliteCon.backup(backupCon)
+    # except sqlite3.Error as error:
+    #     print("Error while taking backup: ", error)
+    # finally:
+    #     if backupCon:
+    #         backupCon.close()
+    #         sqliteCon.close()
+
+
+def deleteEveryThingFromDatabase():
+    """
+    This is function is basically wipes exvery thing on all tables
+        after several confirmations
+        That is why the name is long to avoid mistakes :)
+    """
+    c.execute("DELETE from customers")
+    c.execute("DELETE from inventory")
+    c.execute("DELETE from sales")
+    c.execute("DELETE from expesnse")
+    c.execute("DELETE from bankAcc")
+    conn.commit()
 
 def closeCursor():
     c.close()

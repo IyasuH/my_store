@@ -60,12 +60,13 @@ def notify(noti_title, noti_msg):
 
 # THE NEXT 4 LINES ONLY RUNS ON android device 
 # USED TO CALL FOR LOCAL STORAGE IN ANDROID DEVICE
-import android
-from android.permissions import request_permissions, Permission
-from android.storage import primary_external_storage_path
-request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
 
-primary_ext_storage = primary_external_storage_path()
+# import android
+# from android.permissions import request_permissions, Permission
+# from android.storage import primary_external_storage_path
+# request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
+
+# primary_ext_storage = primary_external_storage_path()
 
 class MDashCard(MDCard, CommonElevationBehavior):
 	"""
@@ -170,6 +171,118 @@ class MDXpense(MDCard):
 		else:
 			toast('Expenses ID did not found :(')
 		self.dialogDeleteExpenses.dismiss()
+
+class MDItemCard(MDCard):
+	"""
+	Single invntory item card
+	For now it is going only to have three values
+		itemId - Item database Id
+		itemAIcon - Item Availability icon just to show the avialbility of item
+			using three types of icon(,,) for available, criticalLevel, empty
+		itemAIconColor - color for itemAIcon
+		itemName - Sales Item Name
+		itemQty - Quantity
+		itemPrice - single value selling price
+		total - amount in money = Qty * amount
+	"""
+	itemId = NumericProperty(0)
+	itemAIcon = StringProperty("")
+	itemAIconColor = ListProperty([1,1,1,1])
+	itemName = StringProperty("")
+	itemQty = StringProperty("")
+	itemPrice = StringProperty("")
+	total = StringProperty("")
+	def item_detail(self, Id):
+		"""
+		sales detail
+		"""
+		self.item_detailPopup = MDDialog(
+			title="Item detail",
+			type="custom",
+			content_cls=Detail_item_layout(Id),
+			buttons=[
+				MDRaisedButton(
+					text="Edit",
+					on_press=self.editStock,
+				),
+				MDRaisedButton(
+					text="Delete",
+					on_press=self.deleteStock,
+				)
+			]
+		)
+		self.item_detailPopup.open()
+
+	def editStock(self, inst):
+		"""
+		Edit specific stock item
+		"""
+		itemId=self.itemId
+		print("inst in ediStock", itemId)
+		self.dialogEditItem = MDDialog(
+			title="Edit Inventory Item",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Edit_Item_layout(itemId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditItem
+				),
+			]
+		)
+		self.dialogEditItem.open()
+		self.item_detailPopup.dismiss()
+
+	def closeEditItem(self, inst):
+		"""
+		close edit bank
+		"""
+		print("close edit")
+		self.dialogEditItem.dismiss()
+
+	def deleteStock(self, inst):
+		"""
+		delete specific stock item
+		"""
+		itemId=self.itemId
+		self.dialogDeleteItem = MDDialog(
+			title="Are You Sure?",
+			text="You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteItem
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteItem,
+				)
+			]
+		)
+		self.dialogDeleteItem.open()
+		self.item_detailPopup.dismiss()
+
+	def cancleDeleteItem(self, inst):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteItem.dismiss()
+
+	def sureDeleteItem(self, inst):
+		"""
+		do the delete
+		"""
+		self.dialogDeleteItem.dismiss()
+		database.deleteItem(self.itemId)
+		toast("Your File Has been deleted.")
+		self.dialogDeleteItem.dismiss()
 
 
 class MDSalesCard(MDCard):
@@ -1291,57 +1404,42 @@ class Home(MDScreen):
 		"""
 		itemList = database.readSItem()
 		i = 0
-		# here what I tried is to make the code more efficient
-			# like using while loop instead of for
-			# and on the if condition first 
+		totalSA = 0 # total stock value in terms of Birr
 		while i < len(itemList):
 			if itemList[i][2] > 10:
-				ava = ("checkbox-marked-circle", [39/256, 174/256, 96/256, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
+				iconName = "checkbox-marked-circle"
+				iconColor = [39/256, 174/256, 96/256, 1]
 			elif itemList[i][2] > 0:
-				ava = ("alert", [255/256, 165/256, 0, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
+				iconName = "alert"
+				iconColor = [255/256, 165/256, 0, 1]
 			else:
-				ava = ("alert-circle", [1, 0, 0, 1], "[b][size=17]"+itemList[i][1]+"[/size][/b]")
+				iconName = "alert-circle"
+				iconColor = [1, 0, 0, 1]
 			itemList[i].append(float(itemList[i][2])*float(itemList[i][3]))
+			totalSA = totalSA + itemList[i][4]
+			itemList[i].append(iconName)
+			itemList[i].append(iconColor)
 			itemList[i][0] = str(itemList[i][0])
-			# itemList[i][2] = "[size={}][color=#f3781b][b]".format(15)+str(itemList[i][2])+"[/b][/color][/size]"
-			# itemList[i][3] = "[size={}][color=#6d64de][b]".format(15)+str(itemList[i][3])+"[/b][/color][/size]"
-			# itemList[i][4] = "[size={}][color=#02f363][b]".format(15)+str(itemList[i][4])+"[/b][/color][/size]"
-
+			#itemList[i][1] = "[color=#A7A7A7][b]"+str(itemList[i][1])+"[/b][/color]"
+			itemList[i][1] = "[b]"+str(itemList[i][1])+"[/b]"
 			itemList[i][2] = "[color=#f3781b][b]"+str(itemList[i][2])+"[/b][/color]"
 			itemList[i][3] = "[color=#6d64de][b]$ "+str(itemList[i][3])+"[/b][/color]"
 			itemList[i][4] = "[color=#02f363][b]$ "+str(itemList[i][4])+"[/b][/color]"
 
-			itemList[i][1] = ava
+			#itemList[i][1] = ava
 			i += 1
 
-		####THIS IS FOR THE STOCK TAB TO LOAD THE MDDataTable AND Buttons####
 		self.tock_tab.clear_widgets()
-		self.stock_tables = MDDataTable(
-			pos_hint={'center_x': 0.5, 'center_y': .45},
-			rows_num=100,
-			size_hint=(1, 1.1),
-			elevation=3,
-			#background_color_header="#1cca6d",
-			#background_color_cell="#62eaa1",
-			padding=0,
-			# column_data=[
-			# 	("[size={}][color=#a7a7a7b3][b]ID[/b][/color][/size]".format('16sp'), dp(8)),
-			# 	("[size={}][color=#a7a7a7b3][b]Name[/b][/color][/size]".format(16), dp(28)),
-			# 	("[size={}][color=#f3781b][b]Qty[/b][/color][/size]".format(16), dp(10)),
-			# 	("[size={}][color=#6d64de][b]Price[/b][/color][/size]".format(16), dp(15)),
-			# 	("[size={}][color=#02f363][b]Total[/b][/color][/size]".format(16), dp(15))],
-			# row_data=itemList,)
-			column_data=[
-				("[color=#a7a7a7b3][b]ID[/b][/color]", dp(8)),
-				("[color=#a7a7a7b3][b]Name[/b][/color]", dp(25)),
-				("[color=#f3781b][b]Qty[/b][/color]", dp(10)),
-				("[color=#6d64de][b]Price[/b][/color]", dp(17)),
-				("[color=#02f363][b]Total[/b][/color]", dp(20))],
-			row_data=itemList,)
-
-		self.stock_tables.bind(on_row_press=self.item_row_selected)
-
-		self.tock_tab.add_widget(self.stock_tables)
+		self.totalStockAmount.text = "$ "+str(totalSA)
+		[self.tock_tab.add_widget(MDItemCard(
+			itemId = x[0],
+			itemName = x[1],
+			itemQty = str(x[2]),
+			itemPrice = str(x[3]),
+			total = str(x[4]),
+			itemAIcon = str(x[5]),
+			itemAIconColor = x[6]
+		))for x in itemList]
 
 	def select_item_path(self, path):
 		'''
@@ -1394,116 +1492,7 @@ class Home(MDScreen):
 		Called when the user reaches the root of the directory tree
 		'''
 		self.item_manager_open = False
-		self.item_manager.close()			
-
-	def item_row_selected(self, table, row):
-		"""
-		When row selected
-		"""
-		start_index, end_index = row.table.recycle_data[row.index]['range']
-		# this is to get the id since it is on the start_index
-		self.item_detail(row.table.recycle_data[start_index]["text"])
-
-	def item_detail(self, Id):
-		"""
-		dialog popup to display item detail
-		"""
-		#item = database.detailItem(Id)
-		self.item_detailPopup = MDDialog(
-			title="Item detail",
-			type="custom",
-			content_cls=Detail_item_layout(Id),
-			buttons=[
-				MDRaisedButton(
-					text="Edit",
-					on_press=self.editStock,
-					# here I put the item id as id
-					# to get item id since passing value is raising cannot call Error
-					# same for delete
-					id = Id,
-				),
-				MDRaisedButton(
-					text="Delete",
-					on_press=self.deleteStock,
-					id = Id,
-				)
-			]
-		)
-		self.item_detailPopup.open()
-
-	def editStock(self, inst):
-		"""
-		Edit specific stock item
-		"""
-		itemId=inst.id
-		print("inst in ediStock", inst.id)
-		self.dialogEditItem = MDDialog(
-			title="Edit Inventory Item",
-			type="custom",
-			auto_dismiss=False,
-			content_cls=Edit_Item_layout(itemId),
-			buttons=[
-				MDRaisedButton(
-					text="Close",
-					theme_text_color="Custom",
-					on_press=self.closeEditItem
-				),
-			]
-		)
-		self.dialogEditItem.open()
-		self.item_detailPopup.dismiss()
-
-	def closeEditItem(self, inst):
-		"""
-		close edit bank
-		"""
-		print("close edit")
-		self.dialogEditItem.dismiss()
-		self.on_tab_stock()
-
-	def deleteStock(self, inst):
-		"""
-		delete specific stock item
-		"""
-		itemId=inst.id
-		self.dialogDeleteItem = MDDialog(
-			title="Are You Sure?",
-			text="You won't be able to revert this!",
-			#auto_dismiss=False,
-			radius=[20, 7, 20, 7],
-			buttons=[
-				MDFlatButton(
-					text="CANCEL",
-					theme_text_color="Custom",
-					on_press=self.cancleDeleteItem
-				),
-				MDRaisedButton(
-					text="DELETE",
-					theme_text_color="Custom",
-					md_bg_color=(243/255, 63/255, 63/255, 1),
-					on_release=self.sureDeleteItem,
-					id=itemId
-				)
-			]
-		)
-		self.dialogDeleteItem.open()
-		self.item_detailPopup.dismiss()
-	def cancleDeleteItem(self, inst):
-		"""
-		cancle deleting 
-		"""
-		self.dialogDeleteItem.dismiss()
-
-	def sureDeleteItem(self, inst):
-		"""
-		do the delete
-		"""
-		self.dialogDeleteItem.dismiss()
-		database.deleteItem(inst.id)
-		toast("Your File Has been deleted.")
-		self.dialogDeleteItem.dismiss()
-		self.on_tab_stock()
-
+		self.item_manager.close()
 
 	def uploadStockFromFile(self):
 		"""
@@ -1571,9 +1560,12 @@ class Home(MDScreen):
 				monthSales.append(x)
 		# convert (allSales) to (monthSales)
 		# here what i do is to convert itemId to itemName
+		totalSales = 0
 		for x in monthSales:
 			x[0] = database.detailItem(x[0])[1]
+			totalSales = totalSales + x[2]
 
+		self.totalSalesAmount.text = "$ "+str(totalSales)
 		[self.salesTab.add_widget(MDSalesCard(
 			salesId = str(x[4]),
 			salesName = str(x[0]),

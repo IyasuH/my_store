@@ -8,6 +8,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from datetime import datetime
 from datetime import date
 from kivymd.app import MDApp
+from kivy.animation import Animation
 #from kivymd.tools.hotreload.app import MDApp
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.tab import MDTabsBase
@@ -39,6 +40,7 @@ from kivymd.uix.textfield.textfield import MDTextField
 from kivymd.uix.behaviors import HoverBehavior
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.list import IRightBodyTouch
+from kivy.utils import get_color_from_hex
 
 from kivymd.uix.behaviors import (
     RectangularRippleBehavior,
@@ -171,6 +173,89 @@ class MDXpense(MDCard):
 		else:
 			toast('Expenses ID did not found :(')
 		self.dialogDeleteExpenses.dismiss()
+
+class MDCashBankCard(MDCard):
+	"""
+	Single cash bank card
+		date - sales date
+		bankName - bank Name		
+		amount - amount in specified date
+		bankId - bankId 
+		salesId - slaesId(may use for future expansion like making to see salesItem, customerName, ....)
+	"""
+	# for now for this class there is no methods to be called
+	date = StringProperty("")
+	bankName = StringProperty("")
+	amount = StringProperty("")
+	bankId = NumericProperty(0)
+	salesId = NumericProperty(0)
+	itemName = StringProperty("")
+
+class MDCashCashCard(MDCard):
+	"""
+	Single cash cash card
+		date - sales date
+		bankName - bank Name
+		bankId - bankId
+		salesId - slaesId(may use for future expansion like making to see salesItem, customerName, ....)
+	"""
+	date = StringProperty("")
+	amount = StringProperty("")
+	bankId = NumericProperty(0)
+	salesId = NumericProperty(0)
+	itemName = StringProperty("")
+
+	def cashToAccount(self):
+		"""
+		transfer from Cash to Account
+			# after cash selected by checker
+			# where choosing account will be done by popup
+		"""
+		# here two queries 
+		## first to edit sales bankId since transeferdd from 12 to _
+		## second to edit bankAcc to subtract amount from bankId 12 and to add amount to bankId _
+		self.selectBankAcc = MDDialog(
+			title="Select Bank Account",
+			type="confirmation",
+			items=[BankConfirm(text=i[1], bankId=str(i[0]))for i in database.readBankAcc()],
+			buttons=[
+				MDFlatButton(
+					text="Cancle",
+					on_release=self.selectBankAccCancle
+				),
+				MDRaisedButton(
+					text="Ok",
+					on_release=self.selectBankAccOk
+				)
+			]
+		)
+		self.selectBankAcc.open()
+
+	def selectBankAccCancle(self, inst):
+		"""
+		Cancle selectBankAcc Dialog
+		"""
+		self.selectBankAcc.dismiss()
+
+	def selectBankAccOk(self, inst):
+		"""
+		for md dialog selectBank OK button callback
+		"""
+		if bankCID == "":
+			toast("please first select bank :(")
+			return
+		if bankCID == "12":
+			toast("That Id is for Cash select another bank :|")
+		database.updateBankAmountC(int(self.amount), bankCID, self.bankId)
+		"""
+		change bankId in sales table from cash 12 to bankCID
+			here first argument is salesId
+			second argument is bankId it changed to 
+		"""
+		database.updateBankIdINSalesC(self.salesId, bankCID)
+		toast("Cash Transferred Successfully :)")
+		self.selectBankAcc.dismiss()
+
 
 class MDItemCard(MDCard):
 	"""
@@ -531,7 +616,7 @@ class CircularProgressBar(AnchorLayout):
 	Circular progressbar
 	"""
 	bar_color = ListProperty([1, 1, 1])
-	bar_width = NumericProperty(3.7)
+	bar_width = NumericProperty(4)
 	# where this value is the percent for the progress bar
 	set_value = NumericProperty(0)
 	text = StringProperty("0%")
@@ -715,6 +800,29 @@ class Edit_Bank_layout(MDBoxLayout):
 		database.updateBankAcc(self.bankId, self.bankEName.text, self.bankEAmount.text, self.bankECreatedAt.text, updatedAt)
 		toast("Data is updated successfully :)")
 
+class Edit_Personal_layout(MDBoxLayout):
+	"""
+	Edit personal info 
+		This is going to be called from setting
+	"""
+	ToDay = date.today()
+	def __init__(self, Id) -> None:
+		super(Edit_Personal_layout, self).__init__(Id)
+		self.Id = Id
+
+		"""
+		This is to change the text of the MDTextField when mddialog open
+		"""
+		person = database.readSPersonal(self.Id)
+		print(person)
+		self.personName.text = person[1]
+
+	def saveChanges(self):
+		"""
+		to save(update) changes to database
+		"""
+		database.updatePersonalInfo(self.Id, self.personName.text)
+		toast("Data is updated successfully :)")
 
 
 class Edit_Expenses_layout(MDBoxLayout):
@@ -972,7 +1080,7 @@ class New_sales_layout(MDBoxLayout):
 		if self.item_quantitiy.text and self.item_id.text:
 			revenu = int(self.item_quantitiy.text) * int(database.detailItem(self.item_id.text)[4])
 			self.sales_revenue.text = str(revenu)
-			self.sales_revenue.hint_text = "in cherecahro"
+			self.sales_revenue.hint_text = "In cherecahro"
 		else:
 			pass
 	def addNewSales(self):
@@ -1018,13 +1126,14 @@ class New_sales_layout(MDBoxLayout):
 				return
 			updateAt = date.today()
 			database.updateItem(item[0], item[1], item[2] - int(self.item_quantitiy.text), item[3], item[4], item[5], updateAt)
-			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.sales_revenue.text, self.bank_id.text)
+			database.insertSales(self.item_id.text, self.customer_id.text, self.item_quantitiy.text, self.sold_date.text, self.sales_revenue.text, self.bank_id.text, self.add_sales_info.text)
 			self.item_id.text = ""
 			self.customer_id.text = ""
 			self.item_quantitiy.text  = ""
 			self.sold_date.text  = ""
 			self.bank_id.text = ""
 			self.sales_revenue.text = ""
+			self.add_sales_info.text = ""
 			toast('Sales added to database now you can close :)')
 		else:
 			toast('Please fill all info :(')
@@ -1176,6 +1285,13 @@ class Home(MDScreen):
 		#self.profitDashBoardCard.elevation = 0
 		#self.customersDashBoardCard.elevation = 4
 		#self.expensesDashBoardCard.elevation = 4
+		self.helloUserName.text = "Hello "+str(database.readPersonal()[0][1])
+		if main.Hr > 6 and main.Hr < 12:
+			self.timelyGretting.text = "G o o d   M o r n i n g  !"
+		elif main.Hr >12 and main.Hr <18:
+			self.timelyGretting.text = "G o o d   A f t e r n o o n  !"
+		else:
+			self.timelyGretting.text = "G o o d   E v e n i n g  !"
 		self.barChartSales.clear_widgets()
 		self.barChartProfit.clear_widgets()
 		self.topClientsList.clear_widgets()
@@ -1207,7 +1323,7 @@ class Home(MDScreen):
 				to show decreasing sine
 				"""
 				self.salesDashBoardCard.updownIcon = 'arrow-bottom-right'
-			print("Percent change for profit: ", salesPercentChange)
+			print("Percent change for sales: ", salesPercentChange)
 			print("This month profit: ", thisMonthSales)
 		else:
 			self.salesDashBoardCard.text2 = str(thisMonthSales)
@@ -1643,146 +1759,74 @@ class Home(MDScreen):
 	#=========================CASH=====================#
 	def on_tab_cash(self):
 		"""
+		on tab tab_cash
 		"""
 		namSize = 12
+		totalInCash = 0
+		totalInBank = 0
 		self.cashBank_tab.clear_widgets()
 		allSales = database.readCashSales()
 		cash = []
 		bank=[]
 		for x in allSales:
 			if x[2] == 12:
+				totalInCash = totalInCash + x[1]
 				x[0] = "[color=#02f363][b]"+x[0]+"[/b][/color]"
 				x[2] = str(x[2])
 				x[3] = str(x[3])
+				x.insert(4, str(database.detailItem(x[4])[1])) # this is for item name
 				cash.append(x)
 			else:
-				#x[1] = "[color=#f3781b][b]"+str(x[1])+"[/b][/color]"
+				totalInBank = totalInBank + x[1]
 				x[0] = "[color=#02f363][b]"+x[0]+"[/b][/color]"
 				bank.append(x)
 		for x in bank:
 			bankName = database.detailBankAccId(x[2])
 			x.insert(1, bankName[1])
+			x.append(str(database.detailItem(x[5])[1]))
 			x[1] = "[color=#f3781b][b]"+str(x[1])+"[/b][/color]"
 			x[2] = "[color=#6d64de][b]$ "+str(x[2])+"[/b][/color]"
-			x[3] = "[size=17][color=#a7a7a7b3]"+str(x[3])+"[/color][/size]"
-			x[4] = "[size=17][color=#a7a7a7b3]"+str(x[4])+"[/color][/size]"
+			#x[3] = "[size=17][color=#a7a7a7b3]"+str(x[3])+"[/color][/size]"
+			#x[4] = "[size=17][color=#a7a7a7b3]"+str(x[4])+"[/color][/size]"
+		print(cash)
+		print(bank)
+		self.cashCash_tab.clear_widgets()
+		self.cashBank_tab.clear_widgets()
+		self.totalInCashAmount.text = "$ "+str(totalInCash)
+		self.totalInBankAmount.text = "$ "+str(totalInBank)
+		[self.cashBank_tab.add_widget(MDCashBankCard(
+			date = x[0],
+			bankName = x[1],
+			amount = x[2],
+			bankId = x[3],
+			salesId = x[4],
+			itemName = (str(x[6]))
+		))for x in bank]
 
-		self.cashBank_tables = MDDataTable(
-			pos_hint={'center_x': 0.5, 'center_y': .5},
-			rows_num=100,
-			background_color='#000000',
-			elevation=3,
-			padding=0,
-			column_data=[
-				("[color=#02f363]Date[/color]", dp(20)),
-				("[color=#f3781b][b]Bank[/b][/color]", dp(20)),
-				("[color=#6d64de][b]Amount[/b][/color]", dp(14)),
-				("[color=#a7a7a7b3][size=17]BId[/size][/color]", dp(8)),
-				("[color=#a7a7a7b3][size=17]SId[/size][/color]", dp(8))],
-			row_data=bank,)
-		#self.stock_tables.bind(on_row_press=self.item_row_selected)
+		[self.cashCash_tab.add_widget(MDCashCashCard(
+			date = x[0],
+			amount = str(x[1]),
+			bankId = x[2],
+			salesId = x[3],
+			itemName = str(x[4])
+		))for x in cash]
 
-		self.cashCash_tables = MDDataTable(
-			pos_hint={'center_x': 0.5, 'center_y': .5},
-			rows_num=100,
-			elevation=3,
-			check=True,
-			padding=0,
-			column_data=[
-				("[color=#02f363]Date[/color]", dp(35)),
-				("[color=#6d64de][b]Amount[/b][/color]", dp(20)),
-				("[color=#a7a7a7b3][size=18]BId[/size][/color]", dp(8)),
-				("[color=#a7a7a7b3][size=18]SId[/size][/color]", dp(8))],
-			row_data=cash,)
-		self.cashCash_tables.bind(on_check_press=self.cashCash_check_press)
-		#self.cashCash_tables.bind(get_row_check=self.printCashChecks)
-		#self.stock_tables.bind(on_row_press=self.item_row_selected)
-		cashToBank = MDIconButton(
-			icon="plus",
-			pos_hint={'x': .8, 'y': .05},
-			on_release=self.cashToAccount
-		)				
-
-		self.cashBank_tab.add_widget(self.cashBank_tables)
-		self.cashCash_tab.add_widget(self.cashCash_tables)
-		self.cashCash_tab.add_widget(cashToBank)
-
-	def cashToAccount(self, inst):
-		"""
-		transfer from Cash to Account
-			# after cash selected by checker
-			# where choosing account will be done by popup
-		"""
-		# here two queries 
-		## first to edit sales bankId since transeferdd from 12 to _
-		## second to edit bankAcc to subtract amount from bankId 12 and to add amount to bankId _
-		self.selectBankAcc = MDDialog(
-			title="Select Bank Account",
-			type="confirmation",
-			items=[BankConfirm(text=i[1], bankId=str(i[0]))for i in database.readBankAcc()],
-			buttons=[
-				MDFlatButton(
-					text="Cancle",
-					on_release=self.selectBankAccCancle
-				),
-				MDRaisedButton(
-					text="Ok",
-					on_release=self.selectBankAccOk
-				)
-			]
-		)
-		self.selectBankAcc.open()
-
-	def selectBankAccCancle(self, inst):
-		"""
-		Cancle selectBankAcc Dialog
-		"""
-		self.selectBankAcc.dismiss()
-
-	def selectBankAccOk(self, inst):
-		"""
-		for md dialog selectBank OK button callback
-		"""
-		if self.cash_to_bank_list == []:
-			toast("please select cash item first :(")
-			return
-		if bankCID == "":
-			toast("please first select bank :(")
-			return
-		if bankCID == "12":
-			toast("That Id is for Cash select another bank :|")
-		for x in self.cash_to_bank_list:
-			"""
-			And here update bankAcc revenue
-				# subtract from Cash (the revenue)And
-				# Add the to given bank 
-			"""
-			database.updateBankAmountC(x[1], bankCID, x[2])
-			"""
-			change bankId in sales table from cash 12 to bankCID
-				here first argument is salesId
-				second argument is bankId it changed to 
-			"""
-			database.updateBankIdINSalesC(x[0], bankCID)
-			toast("Cash Transferred Successfully :)")
-			self.selectBankAcc.dismiss()
-
-	def cashCash_check_press(self, instance_table, current_row):
-		"""
-		when check pressed for cashCash table
-		"""
-		activeRows = instance_table.get_row_checks()
-		bank_sales = []
-		"""
-		bank sales have three componenets
-			0 = sales Id to change bankId
-			1 = sales revenue to edit bankAcc
-			2 = cash Id(if cash changes Id changes in the future)
-		"""
-		for x in activeRows:
-			bank_sales.append([x[3], x[1], x[2]])
-		print(bank_sales)
-		self.cash_to_bank_list = bank_sales
+	# def cashCash_check_press(self, instance_table, current_row):
+	# 	"""
+	# 	when check pressed for cashCash table
+	# 	"""
+	# 	activeRows = instance_table.get_row_checks()
+	# 	bank_sales = []
+	# 	"""
+	# 	bank sales have three componenets
+	# 		0 = sales Id to change bankId
+	# 		1 = sales revenue to edit bankAcc
+	# 		2 = cash Id(if cash changes Id changes in the future)
+	# 	"""
+	# 	for x in activeRows:
+	# 		bank_sales.append([x[3], x[1], x[2]])
+	# 	print(bank_sales)
+	# 	self.cash_to_bank_list = bank_sales
 
 	#===================================================#
 
@@ -1833,8 +1877,8 @@ class Home(MDScreen):
 		"""
 		uploading customer data from XL file
 		"""
-		path = os.path.expanduser("~")
-		self.customer_manager.show(path)
+		#path = os.path.expanduser("~")
+		self.customer_manager.show(primary_ext_storage)
 		self.customer_manager_open = True
 
 	def select_customer_path(self, path):
@@ -1899,7 +1943,17 @@ class Home(MDScreen):
 
 	#===================================================#
 
-
+class NewUserInfo(MDScreen):
+	"""
+	New Account Page
+	"""
+	def createNewUser(self, userName):
+		"""
+		To Validate and Add User info to database
+		"""
+		if userName != "":
+			database.CreateUser(userName, main.ToDay)
+			return "created"
 
 class Expneses(MDScreen):
 	"""
@@ -1952,14 +2006,20 @@ class Expneses(MDScreen):
 		varExpense = database.readSomeVarExpenses
 		monthFixed = []
 		monthVariable = []
-
+		totalVariableExpenses = 0
+		totalFixedExpenses = 0
 		for x in fixExpense():
 			if int(x[3][3:5]) == int(self.monthForExpenses):
 				monthFixed.append(x)
+				totalFixedExpenses = totalFixedExpenses + x[2]
 		for x in varExpense():
 			if int(x[3][3:5]) == int(self.monthForExpenses):
 				monthVariable.append(x)
+				totalVariableExpenses = totalVariableExpenses + x[2]
 
+		self.totalVariableExpenses.text = "$ "+str(totalVariableExpenses)
+		self.totalFixedExpenses.text = "$ "+str(totalFixedExpenses)
+		self.totalExpenses.text = "$ "+str(totalVariableExpenses + totalFixedExpenses)
 		[self.fixedExpenses.add_widget(MDXpense(
 			expenseId = x[0],
 			expenseName = "[color=#a7a7a7b3][b]"+str(x[1])+"[/color][/b]",
@@ -2057,6 +2117,35 @@ class Setting(MDScreen):
 			#self.nightModeSwitch.active = True
 		#else:
 			#self.nightModeSwitch.active = False
+	def on_enter(self):
+		self.accNameEmailNumber.text = str(database.readPersonal()[0][1])
+		self.personId = database.readPersonal()[0][0]
+	def edit_personal_info(self, personId):
+		"""
+		edit call method
+		"""
+		self.dialogEditPersonal = MDDialog(
+			title="Edit Personal info",
+			type="custom",
+			auto_dismiss=False,
+			content_cls=Edit_Personal_layout(personId),
+			buttons=[
+				MDRaisedButton(
+					text="Close",
+					theme_text_color="Custom",
+					on_press=self.closeEditPersonal
+				),
+			]
+		)
+		self.dialogEditPersonal.open()
+
+	def closeEditPersonal(self, *args):
+		"""
+		close edit bank
+		"""
+		print("close edit")
+		self.dialogEditPersonal.dismiss()
+
 
 	def bankList(self):
 		self.dialogBankList = MDDialog(
@@ -2132,6 +2221,7 @@ class main(MDApp):
 	"""
 	main class
 	"""
+	overlay_color = get_color_from_hex("#6042e4")
 	currentTime = datetime.now()
 	Hr = currentTime.hour
 	ToDay = date.today()
@@ -2146,6 +2236,14 @@ class main(MDApp):
 		self.theme_cls.primary_palette = 'Blue'
 		self.theme_cls.material_style ="M3"
 		screen_manager = ScreenManager()
+		if database.readPersonal() == []:
+			"""
+			If no personal information added to the to call
+				page that lets user enter personal info
+				most likely when new person install it
+			But if there is some personal info no need to call that
+			"""
+			screen_manager.add_widget(Builder.load_file("new_user_info.kv"))
 		screen_manager.add_widget(Builder.load_file("home.kv"))
 		screen_manager.add_widget(Builder.load_file("setings.kv"))
 		screen_manager.add_widget(Builder.load_file("expenses.kv"))

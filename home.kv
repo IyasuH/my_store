@@ -170,6 +170,7 @@
     sold_date: sold_date
     sales_revenue: sales_revenue
     bank_id: bank_id
+    add_sales_info: add_sales_info
 	ScrollView:
 		smooth_scroll_end: 10
 		MDList:
@@ -218,9 +219,15 @@
                 multiline: False
                 mode: "rectangle"
                 hint_text: 'Sales Revenue'
+                on_focus: if self.focus: root.calSalesReve()
+
+            MDTextField:
+                id: add_sales_info
+                multiline: False
+                mode: "rectangle"
+                hint_text: 'ADD Info'
 
                 # here add the normal price quantity*price_of_quantity
-                on_focus: if self.focus: root.calSalesReve()
             MDRaisedButton:
             #divider: 'Inset'
                 text: 'Save'
@@ -439,6 +446,101 @@
             #divider: 'Inset'
                 text: 'Save'
                 on_release: root.addNewItem()
+
+<MDCashBankCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '407dp', '50dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    ripple_behavior: True
+    elevation: 4
+    #on_release: root.item_detail(root.itemId)
+    padding: [0,0,5,0]
+    MDGridLayout:
+        cols: 5
+        padding: 10
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        spacing: "5sp"
+        adaptive_height: True
+        MDLabel:
+            markup: True
+            font_size: '12.5sp'
+            bold: True
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.date
+        MDLabel:
+            markup: True
+            font_size: '14sp'
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.bankName
+        MDLabel:
+            markup: True
+            font_size: '14sp'
+            bold: True
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.itemName
+        MDLabel:
+            markup: True
+            font_size: '14sp'
+            theme_text_color: "Custom"
+            bold: True
+            valign: 'center'
+            text_color: [250/255, 115/255, 0]
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.amount
+
+<MDCashCashCard>
+    focus_behavior: True
+    size_hint: None, None
+    size: '407dp', '50dp'
+    unfocus_color: app.theme_cls.bg_normal
+    focus_color: app.theme_cls.bg_dark
+    md_bg_color: app.theme_cls.bg_normal
+    pos_hint: {'center_x': .5, 'center_y': .5}
+    ripple_behavior: True
+    elevation: 4
+    #on_release: root.item_detail(root.itemId)
+    _no_ripple_effect: True
+    padding: [0,0,5,0]
+    MDGridLayout:
+        cols: 5
+        padding: 10
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        spacing: "5sp"
+        adaptive_height: True
+        MDLabel:
+            markup: True
+            font_size: '12.5sp'
+            bold: True
+            valign: 'center'
+            theme_text_color: "Custom"
+            text: root.date
+        MDLabel:
+            markup: True
+            font_size: '14sp'
+            bold: True
+            valign: 'center'
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.itemName
+        MDLabel:
+            markup: True
+            font_size: '14sp'
+            theme_text_color: "Custom"
+            bold: True
+            valign: 'center'
+            text_color: [250/255, 115/255, 0]
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            text: root.amount
+        MDIconButton:
+            icon: "bank-transfer-in"
+            on_release: root.cashToAccount()
+
 
 <MDItemCard>
     focus_behavior: True
@@ -744,7 +846,7 @@
             #md_bg_color: 1, 0, 100/255, .1
             CircularProgressBar:
                 size_hint: None, None
-                size: 97, 97
+                size: 99, 99
                 adaptive_size: True
                 pos_hint: {"x": .75, "y": .25}
                 value: root.cpbValue
@@ -828,7 +930,7 @@
         text: root.refer
         bold: True
         font_size: "14sp"
-        pos_hint: {"center_x": .5, "y":-.57}
+        pos_hint: {"center_x": .5, "y":-.62}
         halign: "center"
         color: root.bar_color
 
@@ -872,10 +974,14 @@ Home:
     expensesDashBoardCard: expensesDashBoardCard
     totalStockAmount: totalStockAmount
     totalSalesAmount: totalSalesAmount
+    totalInCashAmount: totalInCashAmount
+    totalInBankAmount: totalInBankAmount
+    helloUserName: helloUserName
+    timelyGretting: timelyGretting
     MDScreen:
         MDBottomNavigation:
             #panel_color: app.theme_cls.primary_light
-            #text_color_no rmal: app.theme_cls.bg_normal
+            #text_color_normal: app.theme_cls.bg_normal
             text_color_normal: app.theme_cls.opposite_bg_normal
             selected_color_background: app.theme_cls.bg_normal
             set_bars_color: True
@@ -891,7 +997,7 @@ Home:
                     MDTopAppBar:
                         widget_position: 'top'
                         title: "DashBoard"
-                        left_action_items: [["sort-variant"]]
+                        #left_action_items: [["sort-variant"]]
                         right_action_items: [["tune-variant", lambda x:app.gotoSetting(), "Settings"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_dark
@@ -908,16 +1014,18 @@ Home:
                             MDLabel:
                                 text: ''
                             MDLabel:
+                                id: helloUserName
                                 markup: True
-                                text: 'Hello Bety'
+                                text: ''
                                 bold: True
                                 font_size: '29sp'
                             MDLabel:
                                 text: ''    
                             MDLabel:
+                                id: timelyGretting
                                 font_size: '16sp'
                                 bold: True
-                                text: 'W e l c o m e  B a c k  !'
+                                text: ''
                                 color: [167/255, 167/255, 167/255, .5]
                             MDLabel:
                                 text: ''
@@ -1051,7 +1159,7 @@ Home:
                         md_bg_color: app.theme_cls.bg_dark
                         elevation: 5
                     ScrollView:
-                        #do_scroll_x: False
+                        do_scroll_x: False
                         smooth_scroll_end: 15
                         MDBoxLayout:
                             orientation: 'vertical'
@@ -1190,7 +1298,7 @@ Home:
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
                                 pos_hint: {'center_x': .5, 'center_y': .5}
-                                elevation: 1
+                                elevation: 0
                                 MDBoxLayout:
                                     orientation: "horizontal"
                                     md_bg_color: app.theme_cls.bg_darkest
@@ -1218,7 +1326,7 @@ Home:
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_normal
                                 pos_hint: {'center_x': .5, 'center_y': .5}
-                                elevation: 1
+                                elevation: 0
                                 MDBoxLayout:
                                     orientation: "horizontal"
                                     md_bg_color: app.theme_cls.bg_darkest
@@ -1246,7 +1354,7 @@ Home:
                                 focus_color: app.theme_cls.bg_dark
                                 md_bg_color: app.theme_cls.bg_darkest
                                 pos_hint: {'center_x': .5}
-                                elevation: 3
+                                elevation: 0
                                 #ripple_behavior: True
                                 MDFloatLayout:
                                     MDBoxLayout:
@@ -1303,43 +1411,249 @@ Home:
                 text: 'Cash'
                 icon: 'wallet-outline'
                 on_tab_press: root.on_tab_cash()
+                md_bg_color: app.theme_cls.bg_darkest
                 MDBoxLayout:
                     orientation: 'vertical'
                     spacing: "5dp"
                     MDTopAppBar:
+                        id: cashToolBar
                         widget_position: 'top'
                         title: "Cash"
                         left_action_items: [["refresh",lambda x: root.on_tab_cash()]]
-                        right_action_items: [["plus"]]
+                        #right_action_items: [["plus"]]
                         specific_text_color: app.theme_cls.opposite_bg_normal
                         md_bg_color: app.theme_cls.bg_dark
-                        elevation: 1
-                    MDBoxLayout:
-                        orientation: 'vertical'
-                        #adaptive_size: True
-                        MDLabel:
-                            text: 'Bank'
-                            font_size: '20sp'
-                            adaptive_size: True                            
-                            bold: True
-                            pos_hint: {'center_y': .5, 'x': .1}
-                            color: [167/255, 167/255, 167/255, .7]
+                        #elevation: 1
+                    ScrollView:
+                        do_scroll_x: False
+                        do_scroll_y: False
+                        smooth_scroll_end: 10
                         MDBoxLayout:
-                            id: cashBank_tab
                             orientation: 'vertical'
-                            #md_bg_color: app.theme_cls.bg_normal
-                    MDBoxLayout:
-                        orientation: 'vertical'
-                        MDLabel:
-                            text: 'Cash'
-                            font_size: '20sp'
-                            adaptive_size: True                            
-                            bold: True
-                            pos_hint: {'center_y': .5, 'x': .1}
-                            color: [167/255, 167/255, 167/255, .7]
-                        MDFloatLayout:
-                            id: cashCash_tab                        
-                            md_bg_color: app.theme_cls.bg_normal
+                            spacing: 7
+                            adaptive_size: True
+                            MDCard:
+                                #focus_behavior: True
+                                size_hint: None, None
+                                size: '390dp', '30dp'
+                                #unfocus_color: app.theme_cls.bg_normal
+                                #focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5}
+                                elevation: 1
+
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'Bank'
+                                        font_size: '20sp'
+                                        bold: True
+                                        #halign: 'left'
+                                        pos_hint: {'center_y': .5, 'x': .6}
+
+                            MDCard:
+                                size_hint: None, None
+                                size: '390dp', '30dp'
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5}
+                                #elevation: 1
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'T o t a l  I n  B a n k : '
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '18sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalInBankAmount
+                                        text: ''
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        halign: 'right'
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                            MDCard:
+                                focus_behavior: False
+                                size_hint: None, None
+                                size: '410dp', '310dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_darkest
+                                pos_hint: {'center_x': .5}
+                                #elevation: 3
+                                #ripple_behavior: True
+                                MDFloatLayout:
+                                    MDBoxLayout:
+                                        orientation: "vertical"
+                                        pos_hint: {'center_x': .5, 'center_y': .5}
+                                        MDCard:
+                                            #focus_behavior: True
+                                            size_hint: None, None
+                                            size: '410dp', '50dp'
+                                            unfocus_color: app.theme_cls.bg_normal
+                                            focus_color: app.theme_cls.bg_dark
+                                            md_bg_color: app.theme_cls.bg_normal
+                                            pos_hint: {'center_x': .5, 'center_y': .5}
+                                            #elevation: 3
+                                            radius: [10,10,0,0]
+                                            MDGridLayout:
+                                                cols: 4
+                                                padding: "12sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                adaptive_height: True
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Date'
+                                                    color: [2/255, 243/255, 99/255, .8]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Bank'
+                                                    color: [243/255, 120/255, 27/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Item Name'
+                                                    color: [167/255, 167/255, 167/255, .7]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Amount'
+                                                    color: [109/255, 100/255, 222/255, .8]
+                                        ScrollView:
+                                            do_scroll_x: False
+                                            smooth_scroll_end: 10
+                                            size_hint_y: .8
+                                            MDBoxLayout:
+                                                id: cashBank_tab
+                                                adaptive_size: True
+                                                padding: "5sp", "10sp", "10sp", "0sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                orientation: 'vertical'
+#//
+                            MDCard:
+                                #focus_behavior: True
+                                size_hint: None, None
+                                size: '390dp', '30dp'
+                                #unfocus_color: app.theme_cls.bg_normal
+                                #focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5}
+                                #elevation: 1
+
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'Cash'
+                                        font_size: '20sp'
+                                        bold: True
+                                        #halign: 'left'
+                                        pos_hint: {'center_y': .5, 'x': .6}
+
+                            MDCard:
+                                size_hint: None, None
+                                size: '390dp', '30dp'
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5}
+                                #elevation: 1
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    MDLabel:
+                                        text: 'T o t a l  I n  C a s h : '
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '18sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalInCashAmount
+                                        text: ''
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        halign: 'right'
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                            MDCard:
+                                focus_behavior: False
+                                size_hint: None, None
+                                size: '410dp', '310dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_darkest
+                                pos_hint: {'center_x': .5}
+                                MDFloatLayout:
+                                    MDBoxLayout:
+                                        orientation: "vertical"
+                                        pos_hint: {'center_x': .5, 'center_y': .5}
+                                        MDCard:
+                                            size_hint: None, None
+                                            size: '410dp', '50dp'
+                                            unfocus_color: app.theme_cls.bg_normal
+                                            focus_color: app.theme_cls.bg_dark
+                                            md_bg_color: app.theme_cls.bg_normal
+                                            pos_hint: {'center_x': .5, 'center_y': .5}
+                                            #elevation: 3
+                                            radius: [10,10,0,0]
+                                            MDGridLayout:
+                                                cols: 3
+                                                padding: "12sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                adaptive_height: True
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Date'
+                                                    color: [2/255, 243/255, 99/255, .8]
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Item Name'
+                                                MDLabel:
+                                                    bold: True
+                                                    text: 'Amount'
+                                                    color: [243/255, 120/255, 27/255, .7]
+                                        ScrollView:
+                                            do_scroll_x: False
+                                            smooth_scroll_end: 10
+                                            size_hint_y: .8
+                                            MDBoxLayout:
+                                                id: cashCash_tab
+                                                adaptive_size: True
+                                                padding: "5sp", "10sp", "10sp", "0sp"
+                                                spacing: "7sp"
+                                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                                orientation: 'vertical'
+
+
+                    # MDBoxLayout:
+                    #     orientation: 'vertical'
+                    #     #adaptive_size: True
+                    #     MDLabel:
+                    #         text: 'Bank'
+                    #         font_size: '20sp'
+                    #         adaptive_size: True                            
+                    #         bold: True
+                    #         pos_hint: {'center_y': .5, 'x': .1}
+                    #         color: [167/255, 167/255, 167/255, .7]
+                    #     MDBoxLayout:
+                    #         id: cashBank_tab
+                    #         orientation: 'vertical'
+                    # MDBoxLayout:
+                    #     orientation: 'vertical'
+                    #     MDLabel:
+                    #         text: 'Cash'
+                    #         font_size: '20sp'
+                    #         adaptive_size: True                            
+                    #         bold: True
+                    #         pos_hint: {'center_y': .5, 'x': .1}
+                    #         color: [167/255, 167/255, 167/255, .7]
+                    #     MDFloatLayout:
+                    #         id: cashCash_tab                        
+                    #         md_bg_color: app.theme_cls.bg_normal
 
 
             MDBottomNavigationItem:

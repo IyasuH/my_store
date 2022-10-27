@@ -49,12 +49,20 @@ def insertItem(iName, iQuantity, purchasedDate, priceCherecharo, priceBulk):
     print('data inserted successfully')
     conn.commit()
 
-def insertSales(itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId):
+def insertSales(itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId, salesInfo):
     """
     insert function for sales table
     """
-    c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, salesRevenue, bankId) VALUES(?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId))
+    c.execute("INSERT INTO sales(itemId, customerId, itemQuantitiy, soldDate, salesRevenue, bankId, add_info) VALUES(?, ?, ?, ?, ?, ?, ?)", (itemId, customerId, itemQuantity, soldDate, salesRevenue, bankId, salesInfo))
     conn.commit()
+
+def CreateUser(usreName, lastLogin):
+    """
+    Create New user
+    """
+    c.execute("INSERT INTO personal(Name, last_login) VALUES(?, ?)", (usreName, lastLogin))
+    conn.commit()
+
 
 # read
 def readBankAcc():
@@ -199,7 +207,7 @@ def readCashSales():
     """
     sales info for cash
     """
-    c.execute("SELECT soldDate, salesRevenue, bankId, salesId FROM sales")
+    c.execute("SELECT soldDate, salesRevenue, bankId, salesId, itemId FROM sales")
     cash = c.fetchall()
     cToList = []
     for x in cash:
@@ -230,6 +238,22 @@ def readCustomerSales(Id):
     c.execute("SELECT * FROM sales where customerId = ?", (Id, ))
     customerSales = c.fetchall()
     return customerSales
+
+def readPersonal():
+    """
+    to read all from personal
+    """
+    c.execute("SELECT * FROM personal")
+    personal = c.fetchall()
+    return personal
+
+def readSPersonal(Id):
+    """
+    To read one person data
+    """
+    c.execute("SELECT * from personal where id = ?", (Id, ))
+    person = c.fetchone()
+    return person
 
 # update
 def updateCustomer(cId, cName, compName, cTinNumber, custCity, cPhoneNumber, createdDate, frequencyPurcases, totPurchases, bankAcc):
@@ -294,6 +318,13 @@ def updateBankAcc(bId, bName, bAmount, bCreated_at, bUpdated_at):
     update bankAcc
     """
     c.execute("UPDATE bankAcc SET bankName = ?, amount = ?, created_at = ?, updated_at = ? WHERE id = ?", (bName, bAmount, bCreated_at, bUpdated_at, bId))
+    conn.commit()
+
+def updatePersonalInfo(pId, Name):
+    """
+    update personal info
+    """
+    c.execute("UPDATE personal SET Name =? WHERE id = ?", (Name, pId))
     conn.commit()
 
 # delete

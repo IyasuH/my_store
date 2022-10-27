@@ -72,6 +72,31 @@
                 # this is to edit account()
                 on_release: root.editAccount(root.bankId)
 
+<Edit_Personal_layout>
+    orientation: "vertical"
+    spacing: "20sp"
+    md_bg_color: app.theme_cls.bg_dark
+    size_hint_y: None
+    height: "200dp"
+    personName: personName
+    ScrollView:
+        do_scroll_x: False
+        smooth_scroll_end: 10
+        MDList:
+            spacing: "14dp"
+            MDList:
+                spacing: "7dp"
+                MDTextField:
+                    id: personName
+                    multiline: False
+                    #mode: "fill"
+                    #hint_text: 'Item Name'
+                    text: ""
+                MDRaisedButton:
+                    padding: "5sp"
+                    text: 'Save Changes'
+                    on_release: root.saveChanges()
+
 <Edit_Bank_layout>
     id: new_fexpense
     orientation: "vertical"
@@ -138,6 +163,7 @@
 Setting:
     name: "setting"
     nightModeSwitch: nightModeSwitch
+    accNameEmailNumber: accNameEmailNumber
     MDScreen:
         MDBoxLayout:
             orientation: 'vertical'
@@ -160,7 +186,6 @@ Setting:
                         #spacing: 1
                         md_bg_color: app.theme_cls.bg_darkest
                         radius: 14, 14, 14, 14
-
                         OneLineListItem:
                             text: "Account"
                             _txt_left_pad: "20dp"
@@ -176,9 +201,9 @@ Setting:
 
                         TwoLineAvatarIconListItem:
                             id: accNameEmailNumber
-                            text: "Bety"
+                            text: ""
                             bg_color: app.theme_cls.bg_darkest
-                            secondary_text: "Personal info"
+                            secondary_text: "Personal Info"
                             _txt_left_pad: "90dp"
                             _no_ripple_effect: True
                             radius: 0, 0, 14, 14
@@ -186,10 +211,11 @@ Setting:
                             IconLeftWidget:
                                 icon: "account-circle"
                                 icon_size: "50sp"
+                                _no_ripple_effect: True
                             IconRightWidget:
                                 icon: "pencil-outline"
                                 icon_size: "20sp"
-                                #on_release: app.edit_account_user()
+                                on_release: root.edit_personal_info(root.personId)
 
                     MDList:
                         #spacing: 1

@@ -168,10 +168,14 @@ Expneses:
     fixedExpenses: fixedExpenses
     variableExpenses: variableExpenses
     monthDropDownMenuCaller: monthDropDownMenuCaller
+    totalVariableExpenses: totalVariableExpenses
+    totalFixedExpenses: totalFixedExpenses
+    totalExpenses: totalExpenses
     MDScreen:
         MDBoxLayout:
             orientation: 'vertical'
             spacing: 1
+            #padding: [5, 2, 2, 2]
             md_bg_color: app.theme_cls.bg_darkest
             MDTopAppBar:
                 widget_position: 'top'
@@ -180,14 +184,15 @@ Expneses:
                 right_action_items: [["export-variant", lambda x:root.exportExpenses()]]
                 specific_text_color: app.theme_cls.opposite_bg_normal
                 md_bg_color: app.theme_cls.bg_dark
-                elevation: 1
+                elevation: 0
             ScrollView:
                 do_scroll_x: False
                 do_scroll_y: False
                 smooth_scroll_end: 10
                 MDBoxLayout:
                     orientation: 'vertical'
-                    spacing: 7
+                    spacing: 1
+                    padding: [5, 2, 2, 2]
                     adaptive_size: True
                     MDCard:
                         #focus_behavior: True
@@ -198,7 +203,6 @@ Expneses:
                         md_bg_color: app.theme_cls.bg_normal
                         pos_hint: {'center_x': .5}
                         elevation: 1
-
                         MDBoxLayout:
                             orientation: "horizontal"
                             md_bg_color: app.theme_cls.bg_darkest
@@ -216,6 +220,33 @@ Expneses:
                                 theme_icon_color: "Custom"
                                 pos_hint: {'center_y': .5, 'x': .8}
                                 on_release: root.main_monthMenu.open()
+                    MDCard:
+                        size_hint: None, None
+                        size: '400dp', '30dp'
+                        unfocus_color: app.theme_cls.bg_normal
+                        focus_color: app.theme_cls.bg_dark
+                        md_bg_color: app.theme_cls.bg_normal
+                        pos_hint: {'center_x': .5, 'center_y': .5}
+                        elevation: 0
+                        MDBoxLayout:
+                            orientation: "horizontal"
+                            md_bg_color: app.theme_cls.bg_darkest
+                            padding: (5, 0, 0 ,0)
+                            MDLabel:
+                                text: 'T o t a l : '
+                                color: [167/255, 167/255, 167/255, .7]
+                                font_size: '16sp'
+                                bold: True
+                                pos_hint: {'center_y': .5, 'x': .6}
+                            MDLabel:
+                                id: totalExpenses
+                                text: ''
+                                color: [167/255, 167/255, 167/255, .7]
+                                halign: 'right'
+                                font_size: '18sp'
+                                markup: True
+                                bold: True
+                                pos_hint: {'center_y': .5, 'x': .6}
 
                     MDCard:
                         #focus_behavior: True
@@ -225,7 +256,7 @@ Expneses:
                         focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_darkest
                         pos_hint: {'center_x': .5}
-                        elevation: 3
+                        #elevation: 3
                         #ripple_behavior: True
                         MDBoxLayout:
                             orientation: "vertical"
@@ -234,17 +265,43 @@ Expneses:
                                 markup: True
                                 text: '[b]Fixed[/b]'
                                 radius: [15,15,0,0]
-                                valign: 'center'
-                                pos_hint: {'center_y': .5}
                                 divider_color: app.theme_cls.primary_dark
-                                #size_hint_y: .18
+                                line_width: 2
                                 _no_ripple_effect: True
                                 IconRightWidget:
                                     icon: "plus"
-                                    icon_size: "30sp"
+                                    #icon_size: "30sp"
                                     theme_icon_color: "Custom"
                                     icon_color: app.theme_cls.primary_dark
                                     on_release: root.addFixedE()
+                            MDCard:
+                                size_hint: None, None
+                                size: '400dp', '30dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                elevation: 0
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    padding: (5, 0, 0 ,0)
+                                    MDLabel:
+                                        text: 'F i x e d   E x p e n s e s : '
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '14sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalFixedExpenses
+                                        text: ''
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        halign: 'right'
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+
                             MDGridLayout:
                                 cols: 3
                                 padding: "12sp"
@@ -286,7 +343,7 @@ Expneses:
                         focus_color: app.theme_cls.bg_dark
                         md_bg_color: app.theme_cls.bg_darkest
                         pos_hint: {'center_x': .5}
-                        elevation: 3
+                        #elevation: 3
                         #ripple_behavior: True
                         MDBoxLayout:
                             orientation: "vertical"
@@ -295,17 +352,42 @@ Expneses:
                                 markup: True
                                 text: '[b]Variable[/b]'
                                 radius: [15,15,0,0]
-                                valign: 'center'
-                                pos_hint: {'center_y': .5}
                                 divider_color: app.theme_cls.primary_dark
-                                #size_hint_y: .18
+                                line_width: 2
                                 _no_ripple_effect: True
                                 IconRightWidget:
                                     icon: "plus"
-                                    icon_size: "30sp"
+                                    #icon_size: "30sp"
                                     theme_icon_color: "Custom"
                                     icon_color: app.theme_cls.primary_dark
                                     on_release: root.addVarE()
+                            MDCard:
+                                size_hint: None, None
+                                size: '400dp', '30dp'
+                                unfocus_color: app.theme_cls.bg_normal
+                                focus_color: app.theme_cls.bg_dark
+                                md_bg_color: app.theme_cls.bg_normal
+                                pos_hint: {'center_x': .5, 'center_y': .5}
+                                elevation: 0
+                                MDBoxLayout:
+                                    orientation: "horizontal"
+                                    md_bg_color: app.theme_cls.bg_darkest
+                                    padding: (5, 0, 0 ,0)
+                                    MDLabel:
+                                        text: 'V a r i a b l e  E x p e n s e s : '
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        font_size: '14sp'
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
+                                    MDLabel:
+                                        id: totalVariableExpenses
+                                        text: ''
+                                        color: [167/255, 167/255, 167/255, .7]
+                                        halign: 'right'
+                                        font_size: '18sp'
+                                        markup: True
+                                        bold: True
+                                        pos_hint: {'center_y': .5, 'x': .6}
                             MDGridLayout:
                                 cols: 4
                                 padding: "12sp"

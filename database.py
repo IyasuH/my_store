@@ -413,7 +413,7 @@ def deleteEveryThingFromDatabase():
     c.execute("DELETE from customers")
     c.execute("DELETE from inventory")
     c.execute("DELETE from sales")
-    c.execute("DELETE from expesnse")
+    c.execute("DELETE from expenses")
     c.execute("DELETE from bankAcc")
     conn.commit()
 

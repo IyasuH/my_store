@@ -68,7 +68,12 @@ def notify(noti_title, noti_msg):
 # from android.storage import primary_external_storage_path
 # request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
 
+# for Android 
 # primary_ext_storage = primary_external_storage_path()
+
+## And this is save files for PC app 
+location=os.getcwd()
+primary_ext_storage = location
 
 class MDashCard(MDCard, CommonElevationBehavior):
 	"""
@@ -616,7 +621,10 @@ class CircularProgressBar(AnchorLayout):
 	Circular progressbar
 	"""
 	bar_color = ListProperty([1, 1, 1])
-	bar_width = NumericProperty(4)
+	# for PC
+	bar_width = NumericProperty(2.5)
+	# for Android
+	##bar_width = NumericProperty(4)
 	# where this value is the percent for the progress bar
 	set_value = NumericProperty(0)
 	text = StringProperty("0%")
@@ -1615,9 +1623,12 @@ class Home(MDScreen):
 		uploading stock data from XL file
 		"""
 		#app_path = os.path.dirname(os.path.abspath(__file__))
-		#path = os.path.expanduser("~")
-		#androidPath = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'Downloads')
-		self.item_manager.show(primary_ext_storage)
+		path = os.path.expanduser("~")
+		#androidPath = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'Downloads'
+		self.item_manager.show(path)
+		## For Android
+		#self.item_manager.show(primary_ext_storage)
+
 		self.item_manager_open = True
 	def newStock(self):
 		"""
@@ -1725,7 +1736,9 @@ class Home(MDScreen):
 		for sales in monthSales:
 			sheet.append(sales)
 		#androidPath = os.path.join(os.getenv('EXTERNAL_STORAGE'), 'Downloads')
-		book.save("{}/{}_{}_sales.xlsx".format(primary_ext_storage, self.monthShort, date.today().strftime("%Y")))
+		book.close()
+		book.save("{}/{}_{}_{}_sales.xlsx".format(primary_ext_storage, self.monthShort, date.today().strftime("%Y"), date.today().strftime("%d")))
+		#book.close()
 		toast("Your file is saved as {}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 
 	def newSales(self):
@@ -1877,8 +1890,11 @@ class Home(MDScreen):
 		"""
 		uploading customer data from XL file
 		"""
-		#path = os.path.expanduser("~")
-		self.customer_manager.show(primary_ext_storage)
+		path = os.path.expanduser("~")
+		self.customer_manager.show(path)
+
+		## Android
+		#self.customer_manager.show(primary_ext_storage)
 		self.customer_manager_open = True
 
 	def select_customer_path(self, path):
@@ -2104,7 +2120,9 @@ class Expneses(MDScreen):
 		monthExpense.insert(0, col0)
 		for expenses in monthExpense:
 			sheet.append(expenses)
+		book.close()
 		book.save("{}/{}_{}_expenses.xlsx".format(primary_ext_storage, self.monthShort, date.today().strftime("%Y")))
+		#book.close()
 		toast("Your file is saved as {}_{}_sales.xlsx".format(self.monthShort, date.today().strftime("%Y")))
 
 
@@ -2215,6 +2233,44 @@ class Setting(MDScreen):
 			main().theme_cls.theme_style = "Dark"
 			print("was lightMode now to darkMode")
 			self.nightModeSwitch.active = True
+
+	def deleteEveryThing(self):
+		"""
+		deleteEveryThing call method
+		"""
+		self.dialogDeleteEveryThings = MDDialog(
+			title="Are You Sure?",
+			text="This will delete everything on the database including\n(customers, inventory, sales, exepenses and bank account data)\n You won't be able to revert this!",
+			#auto_dismiss=False,
+			radius=[20, 7, 20, 7],
+			buttons=[
+				MDFlatButton(
+					text="CANCEL",
+					theme_text_color="Custom",
+					on_press=self.cancleDeleteEveryThing
+				),
+				MDRaisedButton(
+					text="DELETE",
+					theme_text_color="Custom",
+					md_bg_color=(243/255, 63/255, 63/255, 1),
+					on_release=self.sureDeleteEveryThing
+				)
+			]
+		)
+		self.dialogDeleteEveryThings.open()
+	def cancleDeleteEveryThing(self, *args):
+		"""
+		cancle deleting 
+		"""
+		self.dialogDeleteEveryThings.dismiss()
+
+	def sureDeleteEveryThing(self, *args):
+		"""
+		to delete every thing from database
+		"""
+		self.dialogDeleteEveryThings.dismiss()
+		print('[INFO]: Now DataBase is Wiped')
+		database.deleteEveryThingFromDatabase()
 
 
 class main(MDApp):

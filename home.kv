@@ -846,7 +846,10 @@
             #md_bg_color: 1, 0, 100/255, .1
             CircularProgressBar:
                 size_hint: None, None
-                size: 99, 99
+                # for PC
+                size: 60, 60
+                ## for Android
+                #size: 99, 99
                 adaptive_size: True
                 pos_hint: {"x": .75, "y": .25}
                 value: root.cpbValue
@@ -1426,7 +1429,9 @@ Home:
                         #elevation: 1
                     ScrollView:
                         do_scroll_x: False
-                        do_scroll_y: False
+                        do_scroll_y: True
+                        ## for Android
+                        #do_scroll_y: False
                         smooth_scroll_end: 10
                         MDBoxLayout:
                             orientation: 'vertical'

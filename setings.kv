@@ -285,3 +285,15 @@ Setting:
                             icon: 'lifebuoy'
                         IconRightWidgetWithoutTouch:
                             icon: 'chevron-right'
+                    OneLineIconListItem:
+                        radius: 13, 13, 13, 13
+                        text: "Clear Database"
+                        bg_color: app.theme_cls.bg_darkest
+                        text_color: (1, 0, 0, 1)
+                        theme_text_color: 'Custom'
+                        divider: None
+                        on_release: root.deleteEveryThing()
+                        IconLeftWidgetWithoutTouch:
+                            icon: "trash-can"
+                            theme_icon_color: "Custom"
+                            icon_color: (1, 0, 0, 1)
